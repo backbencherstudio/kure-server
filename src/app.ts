@@ -7,7 +7,7 @@ app.use(express.json());
 app.use(core());
 
 app.get("/", (req: Request, res: Response) => {
-  const a = 10;
+  const a = "cool";
   res.send(a);
 });
 

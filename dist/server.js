@@ -21,7 +21,7 @@ function main() {
         try {
             yield mongoose_1.default.connect(config_1.default.database_url);
             app_1.default.listen(config_1.default.port, () => {
-                console.log(`Example app listening on PORT ${config_1.default.port}`);
+                console.log(`Example app listening on PORT === ${config_1.default.port}`);
             });
         }
         catch (error) {
@@ -30,3 +30,5 @@ function main() {
     });
 }
 main();
+// fozlerabbishuvo
+// 6G1ozScccglhbdF9
