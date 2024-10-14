@@ -22,7 +22,6 @@ const loginUserIntoDB = async (paylod: TLoginUser) => {
   if (!userData) {
     throw new AppError(httpStatus.NOT_FOUND, 'User is not found');
   }
-  // =================================>>>>>  checking if the password is correct or not
   if (!(await User.isPasswordMatched(paylod?.password, userData?.password))) {
     throw new AppError(httpStatus.FORBIDDEN, 'password is not matched');
   }

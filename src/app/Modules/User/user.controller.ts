@@ -1,7 +1,6 @@
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import { catchAsync } from '../../utils/catchAsync';
-// import config from '../../config';
 import { UserServices } from './user.service';
 import config from '../../config';
 
