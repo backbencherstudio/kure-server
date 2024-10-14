@@ -15,6 +15,7 @@ const userNameSchema = new Schema<TUserName>({
     trim: true,
     required: [true, 'Last name is required'],
   },
+   _id: false 
 });
 
 const userSchema = new Schema<TUser, UserModel>(
@@ -33,13 +34,10 @@ const userSchema = new Schema<TUser, UserModel>(
       required: [true, 'Password is required'],
       select: 0,
     },
-    role: {
-      type: String,
-      default: 'admin',
-    },
   },
   {
     timestamps: true,
+    versionKey: false
   },
 );
 

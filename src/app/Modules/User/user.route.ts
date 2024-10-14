@@ -11,20 +11,11 @@ router.post(
   userController.createUser,
 );
 
-// router.get('/all-users', userController.gatAllUsers);
-// router.patch('/all-users', userController.updateUserRole);
-// router.delete('/all-users/:id', userController.deleteUser);
+router.post(
+  '/login',
+  validateRequest(UserValidation.loginValidationSchema),
+  userController.loginUser,
+);
 
-// router.post(
-//   '/login',
-//   validateRequest(UserValidation.loginValidationSchema),
-//   userController.loginUser,
-// );
-
-// router.post(
-//   '/refresh-token',
-//   validateRequest(UserValidation.refreshTokenValidationSchema),
-//   userController.refreshToken,
-// );
 
 export const UserRouter = router;

@@ -22,7 +22,6 @@ const createUserValidationSchema = z.object({
         .string()
         .email('Invalid email address')
         .min(1, 'Email is required'),
-      role: z.string().optional().default('user'),
     }),
   }),
 });
@@ -34,14 +33,9 @@ const loginValidationSchema = z.object({
   }),
 });
 
-const refreshTokenValidationSchema = z.object({
-  cookies: z.object({
-    refreshToken: z.string({ required_error: 'Refresh token is required!' }),
-  }),
-});
+
 
 export const UserValidation = {
   createUserValidationSchema,
   loginValidationSchema,
-  refreshTokenValidationSchema,
 };

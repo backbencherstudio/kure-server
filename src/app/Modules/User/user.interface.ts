@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 export type TUserName = {
   firstName: string;
   lastName: string;
+  _id : boolean;
 };
 
 export interface TUser {
@@ -12,7 +13,6 @@ export interface TUser {
   email: string;
   password: string;
   name: TUserName;
-  role: 'supperAdmin' | 'admin';
 }
 
 // ======================================>>>>>>>> Login Interface
