@@ -34,8 +34,18 @@ const loginValidationSchema = z.object({
 });
 
 
+const emailValidationSchema = z.object({
+  body: z.object({
+    emailData : z.object({
+      email: z.string({ required_error: 'email is required' }),
+    })
+  }),
+});
+
+
 
 export const UserValidation = {
   createUserValidationSchema,
   loginValidationSchema,
+  emailValidationSchema
 };

@@ -17,5 +17,11 @@ router.post(
   userController.loginUser,
 );
 
+router.post(
+  '/storeEmail',
+  validateRequest(UserValidation.emailValidationSchema),
+  userController.createUserEmail,
+);
+
 
 export const UserRouter = router;

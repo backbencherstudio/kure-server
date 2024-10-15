@@ -34,7 +34,20 @@ const loginUser = catchAsync(async (req, res) => {
 });
 
 
+const createUserEmail = catchAsync(async (req, res) => {
+  const { emailData } = req.body; 
+  const result = await UserServices.createUserEmailIntoDB(emailData);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User Email Stored successFully',
+    data: result,
+  });
+});
+
+
 export const userController = {
   createUser,
   loginUser,
+  createUserEmail
 };

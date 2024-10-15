@@ -28,3 +28,9 @@ export interface UserModel extends Model<TUser> {
     hashPassword: string,
   ): Promise<boolean>;
 }
+
+
+
+export interface TUserEmail {
+  email: string;
+}

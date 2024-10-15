@@ -2,7 +2,7 @@
 import { AppError } from '../../errors/AppErrors';
 import httpStatus from 'http-status';
 import { TLoginUser, TUser } from './user.interface';
-import { User } from './user.model';
+import { User, UserEmail } from './user.model';
 import config from '../../config';
 import { createToken } from './user.utils';
 
@@ -14,6 +14,7 @@ const createUserIntoDB = async (payload: TUser) => {
   const result = await User.create(payload);
   return result;
 };
+
 
 
 const loginUserIntoDB = async (paylod: TLoginUser) => {  
@@ -47,7 +48,18 @@ const loginUserIntoDB = async (paylod: TLoginUser) => {
 };
 
 
+const createUserEmailIntoDB = async (payload: TUser) => {
+  const isStudentExists = await UserEmail.findOne({ email: payload.email });
+  if (isStudentExists) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User already exists');
+  }
+  const result = await UserEmail.create(payload);
+  return result;
+};
+
+
 export const UserServices = {
   createUserIntoDB,
-  loginUserIntoDB
+  loginUserIntoDB,
+  createUserEmailIntoDB
 };
