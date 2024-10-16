@@ -24,6 +24,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.8.0",
     "mongoose": "^8.3.5",
+    "paypal-rest-sdk": "^1.8.1",
+    "stripe": "^17.2.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -32,6 +34,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.7",
+    "@types/paypal-rest-sdk": "^1.7.9",
     "@typescript-eslint/eslint-plugin": "^7.9.0",
     "@typescript-eslint/parser": "^7.9.0",
     "eslint": "^8.53.0",

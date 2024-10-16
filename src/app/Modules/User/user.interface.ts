@@ -30,7 +30,6 @@ export interface UserModel extends Model<TUser> {
 }
 
 
-
 export interface TUserEmail {
   email: string;
 }
