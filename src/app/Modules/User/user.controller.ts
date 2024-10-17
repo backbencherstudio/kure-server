@@ -34,13 +34,13 @@ const loginUser = catchAsync(async (req, res) => {
 });
 
 
-const createUserEmail = catchAsync(async (req, res) => {
-  const { emailData } = req.body; 
-  const result = await UserServices.createUserEmailIntoDB(emailData);
+const verifyOTP = catchAsync(async (req, res) => {
+  const { email, otp } = req.body;
+  const result = await UserServices.verifyOTPintoDB(email, otp);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'User Email Stored successFully',
+    message: 'User Registered successFully',
     data: result,
   });
 });
@@ -49,5 +49,5 @@ const createUserEmail = catchAsync(async (req, res) => {
 export const userController = {
   createUser,
   loginUser,
-  createUserEmail
+  verifyOTP
 };

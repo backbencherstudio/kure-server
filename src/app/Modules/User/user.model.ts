@@ -1,63 +1,77 @@
-import { Schema, model } from 'mongoose';
-import { TUser, TUserEmail, TUserName, UserModel } from './user.interface';
-import config from '../../config';
+import { model, Schema } from "mongoose";
 import bcrypt from 'bcrypt';
+import { TampUser, TUser } from "./user.interface";
 
-const userNameSchema = new Schema<TUserName>({
-  firstName: {
-    type: String,
-    required: [true, 'First name is required'],
-    trim: true,
-    maxlength: [10, 'name can not be more then 10 character'],
-  },
-  lastName: {
-    type: String,
-    trim: true,
-    required: [true, 'Last name is required'],
-  },
-   _id: false 
-});
 
-const userSchema = new Schema<TUser, UserModel>(
+const TampUserSchema = new Schema<TampUser>(
   {
+    id: {
+      type: String,
+    },
+    otp: {
+      type: String,
+      required: [true, "Otp is required"],
+    },
     name: {
-      type: userNameSchema,
-      required: [true, 'Name is required'],
+      type: String,
+      required: [true, "Name is required"],
     },
     email: {
       type: String,
-      required: [true, 'Email is required'],
+      required: [true, "Email is required"],
       unique: true,
     },
     password: {
       type: String,
-      required: [true, 'Password is required'],
-      select: 0,
+      required: [true, "Password is required"],
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    expiresAt: { type: Date, required: true },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+
+
+const userSchema = new Schema<TUser>(
+  {
+    id: {
+      type: String,
+    },
+    Id: {
+      type: Number,
+      required: [true, "Id is required"],
+    },
+    name: {
+      type: String,
+      required: [true, "Name is required"],
+    },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+    },
+    password: {
+      type: String,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   {
     timestamps: true,
-    versionKey: false
-  },
+  }
 );
 
-userSchema.pre('save', async function (next) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_round),
-  );
-  next();
-});
 
-userSchema.post('save', function (doc, next) {
-  doc.password = '';
-  next();
-});
-userSchema.statics.isUserExistsByCustomeId = async function (email: string) {
-  return await User.findOne({ email }).select('+password');
-};
+
+
 userSchema.statics.isPasswordMatched = async function (
   plainTextPassword,
   hashPassword,
@@ -66,20 +80,7 @@ userSchema.statics.isPasswordMatched = async function (
 };
 
 
-// =============================================================>>>>>>>>>>>
-const userEmailSchema = new Schema<TUserEmail>(
-  {
-    email : {
-      type : String,
-      required : [true, "Email is required"]
-    }
-  },
-  { versionKey: false }
-)
 
+export const TampUserCollection = model<TUser>('TampUser', TampUserSchema);
 
-
-
-export const User = model<TUser, UserModel>('User', userSchema);
-
-export const UserEmail = model<TUserEmail>('UserEmail', userEmailSchema);
+export const User = model<TUser>('User', userSchema);

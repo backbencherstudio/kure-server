@@ -1,34 +1,111 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AppError } from '../../errors/AppErrors';
-import httpStatus from 'http-status';
-import { TLoginUser, TUser } from './user.interface';
-import { User, UserEmail } from './user.model';
-import config from '../../config';
-import { createToken } from './user.utils';
+import httpStatus from "http-status";
+import { AppError } from "../../errors/AppErrors";
+import bcrypt from 'bcrypt'; 
+import config from "../../config";
+import { TampUserCollection, User } from "./user.model";
+import { TLoginUser, TUser } from "./user.interface";
+import { sendEmail } from "../../utils/sendEmail";
+import { createToken } from "./user.utils";
+// import { sendEmailToUser } from "../../utils/sendEmailToUser";
 
-const createUserIntoDB = async (payload: TUser) => {
-  const isStudentExists = await User.findOne({ email: payload.email });
-  if (isStudentExists) {
+
+const getAllUserFromDB = async () =>{
+  const result = await User.find()
+  return result
+}
+
+
+const createUserIntoDB = async (payload: TUser) => {  
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expirationTime = new Date(Date.now() + 2 * 60 * 1000);
+
+  const isStudentExists = await TampUserCollection.findOne({ email: payload?.email });
+  const isStudentExistsInUser = await User.findOne({ email: payload?.email });
+
+  const hashedPassword = await bcrypt.hash(payload?.password, 8); 
+
+  if (isStudentExistsInUser ) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User already exists');
   }
-  const result = await User.create(payload);
-  return result;
+
+  if(isStudentExists){   
+    const data = {
+      otp ,
+      password : hashedPassword,
+      expiresAt : expirationTime
+    }
+
+    await TampUserCollection.findOneAndUpdate({email : payload?.email}, data , {new : true, runValidators : true})
+    await sendEmail(payload?.email, otp);
+    return
+  }
+
+  const newUserData = {
+    email: payload?.email,
+    password: hashedPassword,
+    name: payload?.name,
+    otp,
+    expiresAt: expirationTime, 
+  };
+
+  await sendEmail(payload?.email, otp);
+  await TampUserCollection.create(newUserData);
+  return {
+    success: true,
+    message: 'OTP sent to your email. Please verify to complete registration.',
+  };
+};
+
+const verifyOTPintoDB = async (email: string, otp: string) => {
+  const tempUser = await TampUserCollection.findOne({ email });
+  
+  if (!tempUser) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User not found. Try again');
+  }
+
+  if (tempUser.otp !== otp) {    
+    throw new AppError(400, 'OTP not matched, try again');
+  }
+  
+  if (new Date() > tempUser.expiresAt) {
+    throw new AppError(400, 'OTP has expired, please request a new one');
+  }
+
+  const lastDocument = await User.findOne().sort({ _id: -1 }).exec();
+  const lastDocumentId = lastDocument?.Id || 0;
+
+  const newUserData = {
+    Id: lastDocumentId + 1,
+    email: tempUser.email,
+    password: tempUser.password,
+    name: tempUser.name,
+  };
+
+  await User.create(newUserData);
+  await TampUserCollection.deleteOne({ email });
+
+  return {
+    success: true,
+    message: 'User registered successfully!',
+  };
 };
 
 
-
 const loginUserIntoDB = async (paylod: TLoginUser) => {  
-  const userData = await User.isUserExistsByCustomeId(paylod.email);
-  
+  const userData = await User.findOne({email : paylod.email});
+
   if (!userData) {
     throw new AppError(httpStatus.NOT_FOUND, 'User is not found');
   }
-  if (!(await User.isPasswordMatched(paylod?.password, userData?.password))) {
+    const res = await bcrypt.compare(paylod.password, userData.password)
+  if(!res){
     throw new AppError(httpStatus.FORBIDDEN, 'password is not matched');
   }
-  
+
   const jwtPayload = {
-    email: userData.email
+    email: userData.email,
+    name: userData.name ,
   };
   
   const accessToken = createToken(
@@ -47,19 +124,33 @@ const loginUserIntoDB = async (paylod: TLoginUser) => {
   };
 };
 
+const deleteExpiredUsers = async () => {
+    try {
+    const now = new Date();    
+    const expiredUsers = await TampUserCollection.find({ expiresAt: { $lte: now } });
 
-const createUserEmailIntoDB = async (payload: TUser) => {
-  const isStudentExists = await UserEmail.findOne({ email: payload.email });
-  if (isStudentExists) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'User already exists');
+    if (expiredUsers.length > 0) {
+      console.log("deleted");      
+      await TampUserCollection.deleteMany({ expiresAt: { $lte: now } });
+    } else {
+      console.log("No expired users found");
+    }
+  } catch (error) {
+    console.error("Error deleting expired users:", error);
+    throw new AppError(500, "Failed to delete expired users");
   }
-  const result = await UserEmail.create(payload);
-  return result;
 };
 
+setInterval(() => {
+  deleteExpiredUsers();
+}, 10 * 60 * 1000);
 
-export const UserServices = {
-  createUserIntoDB,
-  loginUserIntoDB,
-  createUserEmailIntoDB
-};
+
+
+
+  export const UserServices = {
+    getAllUserFromDB,
+    createUserIntoDB,
+    verifyOTPintoDB,
+    loginUserIntoDB,
+  };

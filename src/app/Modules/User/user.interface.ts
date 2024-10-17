@@ -2,17 +2,15 @@
 import { Model } from 'mongoose';
 
 // ======================================>>>>>>>> Register Interface
-export type TUserName = {
-  firstName: string;
-  lastName: string;
-  _id : boolean;
-};
-
 export interface TUser {
   id: string;
+  Id : number; 
+  otp: string;
+  name: string;
   email: string;
   password: string;
-  name: TUserName;
+  isDeleted: boolean;  
+  expiresAt : Date;
 }
 
 // ======================================>>>>>>>> Login Interface
@@ -20,6 +18,7 @@ export type TLoginUser = {
   email: string;
   password: string;
 };
+
 
 export interface UserModel extends Model<TUser> {
   isUserExistsByCustomeId(id: string): Promise<TUser>;
@@ -30,6 +29,4 @@ export interface UserModel extends Model<TUser> {
 }
 
 
-export interface TUserEmail {
-  email: string;
-}
+export interface TampUser extends TUser {} 
