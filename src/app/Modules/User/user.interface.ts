@@ -11,6 +11,9 @@ export interface TUser {
   password: string;
   isDeleted: boolean;  
   expiresAt : Date;
+  plan ?: string;
+  price ?: string;
+  userType ?: string;
 }
 
 // ======================================>>>>>>>> Login Interface

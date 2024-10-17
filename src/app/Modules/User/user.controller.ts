@@ -16,6 +16,18 @@ const createUser = catchAsync(async (req, res) => {
 });
 
 
+const purchasePlanController = catchAsync(async (req, res) => {
+  const { purchasePlan: updateData } = req.body;
+  const result = await UserServices.purchasePlan(updateData);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Purchase successFully',
+    data: result,
+  });
+});
+
+
 const loginUser = catchAsync(async (req, res) => {
   const result = await UserServices.loginUserIntoDB(req.body);
   const { refreshToken, accessToken } = result;
@@ -49,5 +61,6 @@ const verifyOTP = catchAsync(async (req, res) => {
 export const userController = {
   createUser,
   loginUser,
-  verifyOTP
+  verifyOTP,
+  purchasePlanController
 };

@@ -8,6 +8,11 @@ router.post(
   userController.createUser,
 );
 
+router.patch(
+  '/purchasePlan',
+  userController.purchasePlanController,
+);
+
 router.post(
   '/login',
   userController.loginUser,

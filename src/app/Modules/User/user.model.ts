@@ -25,6 +25,18 @@ const TampUserSchema = new Schema<TampUser>(
       type: String,
       required: [true, "Password is required"],
     },
+    plan: {
+      type: String,
+      default : ""
+    },
+    price: {
+      type: String,
+      default : ""
+    },
+    userType: {
+      type: String,
+      default : ""
+    },
     isDeleted: {
       type: Boolean,
       default: false,

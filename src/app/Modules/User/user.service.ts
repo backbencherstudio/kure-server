@@ -57,6 +57,13 @@ const createUserIntoDB = async (payload: TUser) => {
   };
 };
 
+const purchasePlan = (payload : Partial<TUser> ) =>{
+  console.log(61, payload);
+  console.log(62, payload?.email);
+  
+}
+
+
 const verifyOTPintoDB = async (email: string, otp: string) => {
   const tempUser = await TampUserCollection.findOne({ email });
   
@@ -153,4 +160,5 @@ setInterval(() => {
     createUserIntoDB,
     verifyOTPintoDB,
     loginUserIntoDB,
+    purchasePlan
   };
