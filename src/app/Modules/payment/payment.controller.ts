@@ -27,6 +27,7 @@ const executePaymentControl = catchAsync(async (req, res) => {
 
 const paymentWithStripe = catchAsync(async (req, res) => {
     const { amount } = req.body;
+    
     const result = await PaymentServices.stripePayment(amount);
     res.status(httpStatus.OK).json({
         success: true,

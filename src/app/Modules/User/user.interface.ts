@@ -14,6 +14,7 @@ export interface TUser {
   plan ?: string;
   price ?: string;
   userType ?: string;
+  expiresDate ?: Date;
 }
 
 // ======================================>>>>>>>> Login Interface

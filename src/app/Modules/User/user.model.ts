@@ -37,6 +37,9 @@ const TampUserSchema = new Schema<TampUser>(
       type: String,
       default : ""
     },
+    expiresDate: {
+      type: Date,
+    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -70,6 +73,21 @@ const userSchema = new Schema<TUser>(
     },
     password: {
       type: String,
+    },
+    plan: {
+      type: String,
+      default : ""
+    },
+    price: {
+      type: String,
+      default : ""
+    },
+    userType: {
+      type: String,
+      default : ""
+    },
+    expiresDate: {
+      type: Date,
     },
     isDeleted: {
       type: Boolean,

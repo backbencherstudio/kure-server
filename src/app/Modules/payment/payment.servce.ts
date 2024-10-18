@@ -13,6 +13,7 @@ paypal.configure({
 });
 
 const paymentFun = (amount: TPaymentAmount): Promise<{ forwardLink: string }> => {
+
     return new Promise((resolve, reject) => {
         const create_payment_json = {
             "intent": "sale",
@@ -36,7 +37,6 @@ const paymentFun = (amount: TPaymentAmount): Promise<{ forwardLink: string }> =>
             if (error) {
                 reject(new AppError(httpStatus.BAD_REQUEST, error.message));
             } else if (payment && payment.links) {
-                // Safely access payment.links using Type Guards
                 const forwardLink = payment.links.find((link: any) => link.rel === 'approval_url')?.href;
                 if (forwardLink) {
                     resolve({ forwardLink });
@@ -68,11 +68,11 @@ const executePaymentFun = (orderID : string, payerID : string) => {
 const stripe = new Stripe('sk_test_51NFvq6ArRmO7hNaVBU6gVxCbaksurKb6Sspg6o8HePfktRB4OQY6kX5qqcQgfxnLnJ3w9k2EA0T569uYp8DEcfeq00KXKRmLUw');
 
 
-const stripePayment = async (amount: number) => {
+const stripePayment = async (amount: number) => {   
+    
     try {
-        // Convert amount to cents since Stripe works with cents.
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: amount * 100, // amount in cents
+            amount: amount  * 100, 
             currency: 'usd',
             payment_method_types: ['card'],
         });

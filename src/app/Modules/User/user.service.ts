@@ -57,11 +57,30 @@ const createUserIntoDB = async (payload: TUser) => {
   };
 };
 
-const purchasePlan = (payload : Partial<TUser> ) =>{
-  console.log(61, payload);
-  console.log(62, payload?.email);
+const purchasePlan = async (payload: Partial<TUser>) => {
+  const day = parseInt(payload.plan?.split(" ")[0] || "0", 10);
+
+  const currentDate = new Date();
+  const expiresDate = new Date(currentDate.setDate(currentDate.getDate() + day));
   
-}
+  const updateData = {
+    $set: {
+      plan: payload.plan,
+      price: payload.price,
+      userType: payload.userType,
+      expiresDate, 
+    },
+  };
+
+  const result = await User.findOneAndUpdate(
+    { email: payload.email },
+    updateData,
+    { new: true, runValidators: true }
+  );
+
+  return result;
+};
+
 
 
 const verifyOTPintoDB = async (email: string, otp: string) => {
@@ -150,7 +169,7 @@ const deleteExpiredUsers = async () => {
 
 setInterval(() => {
   deleteExpiredUsers();
-}, 10 * 60 * 1000);
+}, 30 * 60 * 1000);
 
 
 
