@@ -7,7 +7,6 @@ import { TampUserCollection, User } from "./user.model";
 import { TLoginUser, TUser } from "./user.interface";
 import { sendEmail } from "../../utils/sendEmail";
 import { createToken } from "./user.utils";
-// import { sendEmailToUser } from "../../utils/sendEmailToUser";
 
 
 const getAllUserFromDB = async () =>{
@@ -62,7 +61,7 @@ const purchasePlan = async (payload: Partial<TUser>) => {
 
   const currentDate = new Date();
   const expiresDate = new Date(currentDate.setDate(currentDate.getDate() + day));
-  
+
   const updateData = {
     $set: {
       plan: payload.plan,
@@ -132,6 +131,8 @@ const loginUserIntoDB = async (paylod: TLoginUser) => {
   const jwtPayload = {
     email: userData.email,
     name: userData.name ,
+    userType : userData.userType,
+    expiresDate : userData.expiresDate,
   };
   
   const accessToken = createToken(
@@ -149,6 +150,7 @@ const loginUserIntoDB = async (paylod: TLoginUser) => {
     refreshToken,
   };
 };
+
 
 const deleteExpiredUsers = async () => {
     try {
@@ -170,9 +172,6 @@ const deleteExpiredUsers = async () => {
 setInterval(() => {
   deleteExpiredUsers();
 }, 30 * 60 * 1000);
-
-
-
 
   export const UserServices = {
     getAllUserFromDB,

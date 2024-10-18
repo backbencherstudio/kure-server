@@ -64,7 +64,6 @@ const executePaymentFun = (orderID : string, payerID : string) => {
     });
 };
 
-
 const stripe = new Stripe('sk_test_51NFvq6ArRmO7hNaVBU6gVxCbaksurKb6Sspg6o8HePfktRB4OQY6kX5qqcQgfxnLnJ3w9k2EA0T569uYp8DEcfeq00KXKRmLUw');
 
 
