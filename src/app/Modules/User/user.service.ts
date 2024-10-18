@@ -57,7 +57,7 @@ const createUserIntoDB = async (payload: TUser) => {
 };
 
 const purchasePlan = async (payload: Partial<TUser>) => {
-  const day = parseInt(payload.plan?.split(" ")[0] || "0", 10);
+  const day = parseInt(payload.plan|| "0", 10);
 
   const currentDate = new Date();
   const expiresDate = new Date(currentDate.setDate(currentDate.getDate() + day));
