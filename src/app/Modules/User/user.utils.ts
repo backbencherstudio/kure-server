@@ -6,6 +6,7 @@ export const createToken = (
     name : string;
     userType : string | undefined;
     expiresDate : Date | undefined ;
+    createdAt : Date | undefined ;
   },
   secret: string,
   expiresIn: string,

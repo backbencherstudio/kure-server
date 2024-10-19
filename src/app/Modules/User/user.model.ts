@@ -88,7 +88,7 @@ const userSchema = new Schema<TUser>(
       type: String,
       default : ""
     },
-    orderID : { type : String },
+    orderID : { type : String, default : "" },
     payerID : { type : String, default : "" },
     expiresDate: {
       type: Date,

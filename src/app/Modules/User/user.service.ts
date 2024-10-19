@@ -68,7 +68,7 @@ const purchasePlan = async (payload: Partial<TUser>) => {
       price: payload.price,
       userType: payload.userType,
       expiresDate,
-      orderID : payload.orderID ,
+      orderID : payload.orderID || "" ,
       payerID : payload.payerID || "",
     },
   };
@@ -133,6 +133,7 @@ const loginUserIntoDB = async (paylod: TLoginUser) => {
     name: userData.name ,
     userType : userData.userType,
     expiresDate : userData.expiresDate,
+    createdAt : userData.createdAt
   };
   
   const accessToken = createToken(
