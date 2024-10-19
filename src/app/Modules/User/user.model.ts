@@ -40,6 +40,8 @@ const TampUserSchema = new Schema<TampUser>(
     expiresDate: {
       type: Date,
     },
+    orderID : { type : Number },
+    payerID : { type : Number },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -86,6 +88,8 @@ const userSchema = new Schema<TUser>(
       type: String,
       default : ""
     },
+    orderID : { type : String },
+    payerID : { type : String, default : "" },
     expiresDate: {
       type: Date,
     },

@@ -15,6 +15,8 @@ export interface TUser {
   price ?: string;
   userType ?: string;
   expiresDate ?: Date;
+  orderID ?: string ;
+  payerID ?: string ;
 }
 
 // ======================================>>>>>>>> Login Interface

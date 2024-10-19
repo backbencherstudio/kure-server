@@ -67,16 +67,16 @@ const purchasePlan = async (payload: Partial<TUser>) => {
       plan: payload.plan,
       price: payload.price,
       userType: payload.userType,
-      expiresDate, 
+      expiresDate,
+      orderID : payload.orderID ,
+      payerID : payload.payerID || "",
     },
   };
-
   const result = await User.findOneAndUpdate(
     { email: payload.email },
     updateData,
     { new: true, runValidators: true }
   );
-
   return result;
 };
 
