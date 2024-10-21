@@ -1,7 +1,14 @@
 import express from 'express';
 import { userController } from './user.controller';
+import { Auth } from '../../middleware/auth';
 
 const router = express.Router();
+
+router.get(
+  '/',
+  Auth(),
+  userController.getAllUser,
+);
 
 router.post(
   '/create-user',
@@ -21,6 +28,12 @@ router.post(
 router.post(
   '/verifyOTP',
   userController.verifyOTP,
+);
+
+router.post(
+  '/refresh-token',
+  // validateRequest(AuthValidation.refreshTokenValidationSchema),
+  userController.refreshToken,
 );
 
 

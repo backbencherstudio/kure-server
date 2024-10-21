@@ -6,7 +6,7 @@ import config from "../../config";
 import { TampUserCollection, User } from "./user.model";
 import { TLoginUser, TUser } from "./user.interface";
 import { sendEmail } from "../../utils/sendEmail";
-import { createToken } from "./user.utils";
+import { createToken, verifyToken } from "./user.utils";
 
 
 const getAllUserFromDB = async () =>{
@@ -152,6 +152,40 @@ const loginUserIntoDB = async (paylod: TLoginUser) => {
   };
 };
 
+const refreshToken = async (token: string) => {  
+  if (!token) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorize!');
+  }
+  const decoded = verifyToken(token, config.jwt_refresh_secret as string);
+  const { email } = decoded;
+
+  const userData = await User.findOne({email});
+
+  if (!userData) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User is not found');
+  }
+
+  const jwtPayload = {
+    email: userData.email,
+    name: userData.name ,
+    userType : userData.userType,
+    expiresDate : userData.expiresDate,
+    createdAt : userData.createdAt
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  );
+
+  return {
+    accessToken,
+  };
+};
+
+
+
 
 const deleteExpiredUsers = async () => {
     try {
@@ -170,6 +204,7 @@ const deleteExpiredUsers = async () => {
   }
 };
 
+
 setInterval(() => {
   deleteExpiredUsers();
 }, 30 * 60 * 1000);
@@ -179,5 +214,6 @@ setInterval(() => {
     createUserIntoDB,
     verifyOTPintoDB,
     loginUserIntoDB,
-    purchasePlan
+    purchasePlan,
+    refreshToken
   };

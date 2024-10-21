@@ -4,6 +4,16 @@ import { catchAsync } from '../../utils/catchAsync';
 import { UserServices } from './user.service';
 import config from '../../config';
 
+const getAllUser = catchAsync(async (req, res) => {
+  const result = await UserServices.getAllUserFromDB();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'get All user',
+    data: result,
+  });
+});
+
 const createUser = catchAsync(async (req, res) => {
   const { user: userData } = req.body;
   const result = await UserServices.createUserIntoDB(userData);
@@ -45,6 +55,17 @@ const loginUser = catchAsync(async (req, res) => {
   });
 });
 
+const refreshToken = catchAsync(async (req, res) => {
+  const { refreshToken } = req.cookies;
+  const result = await UserServices.refreshToken(refreshToken);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Access is token retrived successfully',
+    data: result,
+  });
+});
+
 
 const verifyOTP = catchAsync(async (req, res) => {
   const { email, otp } = req.body;
@@ -59,8 +80,10 @@ const verifyOTP = catchAsync(async (req, res) => {
 
 
 export const userController = {
+  getAllUser,
   createUser,
   loginUser,
   verifyOTP,
+  refreshToken,
   purchasePlanController
 };
