@@ -7,7 +7,7 @@ const router = express.Router();
 router.get(
   '/',
   Auth(),
-  userController.getAllUser,
+  userController.getSingleUser,
 );
 
 router.post(
@@ -32,7 +32,6 @@ router.post(
 
 router.post(
   '/refresh-token',
-  // validateRequest(AuthValidation.refreshTokenValidationSchema),
   userController.refreshToken,
 );
 

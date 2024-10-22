@@ -68,7 +68,7 @@ const stripe = new Stripe('sk_test_51NFvq6ArRmO7hNaVBU6gVxCbaksurKb6Sspg6o8HePfk
 
 
 const stripePayment = async (amount: number) => {   
-    
+
     try {
         const paymentIntent = await stripe.paymentIntents.create({
             amount: amount  * 100, 

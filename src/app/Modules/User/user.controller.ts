@@ -4,8 +4,8 @@ import { catchAsync } from '../../utils/catchAsync';
 import { UserServices } from './user.service';
 import config from '../../config';
 
-const getAllUser = catchAsync(async (req, res) => {
-  const result = await UserServices.getAllUserFromDB();
+const getSingleUser = catchAsync(async (req, res) => {
+  const result = await UserServices.getSingleUserFromDB(req?.query?.email as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -55,6 +55,7 @@ const loginUser = catchAsync(async (req, res) => {
   });
 });
 
+
 const refreshToken = catchAsync(async (req, res) => {
   const { refreshToken } = req.cookies;
   const result = await UserServices.refreshToken(refreshToken);
@@ -80,7 +81,7 @@ const verifyOTP = catchAsync(async (req, res) => {
 
 
 export const userController = {
-  getAllUser,
+  getSingleUser,
   createUser,
   loginUser,
   verifyOTP,
