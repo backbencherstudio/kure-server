@@ -2,14 +2,20 @@
 import { Model } from 'mongoose';
 
 // ======================================>>>>>>>> Register Interface
+
 export interface TUser {
   id: string;
   Id : number; 
+  selfId ?: number;
+  egoId ?: number;
+  miendId ?: number;
+  bodyId ?: number;
+  category ?: string[];
   otp: string;
   name: string;
   email: string;
   password: string;
-  isDeleted: boolean;  
+  isDeleted: boolean;
   expiresAt : Date;
   plan ?: string;
   price ?: string;

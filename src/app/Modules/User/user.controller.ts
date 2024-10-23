@@ -14,6 +14,17 @@ const getSingleUser = catchAsync(async (req, res) => {
   });
 });
 
+const updateAudio = catchAsync(async (req, res) => {
+  const { audioData } = req.body;
+  const result = await UserServices.updateAudionInfoIntoDB(audioData);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Audion status Update successFully',
+    data: result,
+  });
+});
+
 const createUser = catchAsync(async (req, res) => {
   const { user: userData } = req.body;
   const result = await UserServices.createUserIntoDB(userData);
@@ -82,6 +93,7 @@ const verifyOTP = catchAsync(async (req, res) => {
 
 export const userController = {
   getSingleUser,
+  updateAudio,
   createUser,
   loginUser,
   verifyOTP,

@@ -9,9 +9,17 @@ import { sendEmail } from "../../utils/sendEmail";
 import { createToken, verifyToken } from "./user.utils";
 
 
-const getSingleUserFromDB = async (email : string) =>{
-  
+const getSingleUserFromDB = async (email : string) =>{  
   const result = await User.findOne({email})
+  return result
+}
+
+const updateAudionInfoIntoDB = async (payload : Partial<TUser> ) =>{  
+  const updateData = {
+    selfId : payload?.selfId,
+    category : payload?.category
+  }
+  const result = await User.findOneAndUpdate({email : payload.email}, updateData, { new : true, runValidators : true })
   return result
 }
 
@@ -212,6 +220,7 @@ setInterval(() => {
 
   export const UserServices = {
     getSingleUserFromDB,
+    updateAudionInfoIntoDB,
     createUserIntoDB,
     verifyOTPintoDB,
     loginUserIntoDB,

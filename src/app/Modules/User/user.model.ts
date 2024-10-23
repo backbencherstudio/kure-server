@@ -12,6 +12,25 @@ const TampUserSchema = new Schema<TampUser>(
       type: String,
       required: [true, "Otp is required"],
     },
+    selfId: {
+      type: Number,
+      default : 0
+    },
+    egoId: {
+      type: Number,
+      default : 0
+    },
+    miendId: {
+      type: Number,
+      default : 0
+    },
+    bodyId: {
+      type: Number,
+      default : 0
+    },
+    category: {
+      type: [String],
+    },
     name: {
       type: String,
       required: [true, "Name is required"],
@@ -63,6 +82,25 @@ const userSchema = new Schema<TUser>(
     Id: {
       type: Number,
       required: [true, "Id is required"],
+    },
+    selfId: {
+      type: Number,
+      default : 0
+    },
+    egoId: {
+      type: Number,
+      default : 0
+    },
+    miendId: {
+      type: Number,
+      default : 0
+    },
+    bodyId: {
+      type: Number,
+      default : 0
+    },
+    category: {
+      type: [String],
     },
     name: {
       type: String,

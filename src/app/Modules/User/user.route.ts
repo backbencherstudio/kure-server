@@ -10,6 +10,11 @@ router.get(
   userController.getSingleUser,
 );
 
+router.patch(
+  '/audio',
+  userController.updateAudio,
+);
+
 router.post(
   '/create-user',
   userController.createUser,
