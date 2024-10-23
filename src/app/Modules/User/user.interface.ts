@@ -6,11 +6,11 @@ import { Model } from 'mongoose';
 export interface TUser {
   id: string;
   Id : number; 
-  selfId ?: number;
-  egoId ?: number;
-  miendId ?: number;
-  bodyId ?: number;
-  category ?: string[];
+  selfId ?: string;
+  egoId ?: string;
+  miendId ?: string;
+  bodyId ?: string;
+  category ?: string;
   otp: string;
   name: string;
   email: string;

@@ -84,23 +84,23 @@ const userSchema = new Schema<TUser>(
       required: [true, "Id is required"],
     },
     selfId: {
-      type: Number,
-      default : 0
+      type: String,
+      default : "0"
     },
     egoId: {
-      type: Number,
-      default : 0
+      type: String,
+      default : "0"
     },
     miendId: {
-      type: Number,
-      default : 0
+      type: String,
+      default : "0"
     },
     bodyId: {
-      type: Number,
-      default : 0
+      type: String,
+      default : "0"
     },
     category: {
-      type: [String],
+      type: String,
     },
     name: {
       type: String,

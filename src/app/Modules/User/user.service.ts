@@ -14,14 +14,54 @@ const getSingleUserFromDB = async (email : string) =>{
   return result
 }
 
-const updateAudionInfoIntoDB = async (payload : Partial<TUser> ) =>{  
-  const updateData = {
-    selfId : payload?.selfId,
-    category : payload?.category
+const updateAudionInfoIntoDB = async (payload : Partial<TUser> ) =>{
+  const userData = await User.findOne({email : payload?.email})
+
+  if(userData?.selfId === "end"){
+    delete payload.selfId
   }
-  const result = await User.findOneAndUpdate({email : payload.email}, updateData, { new : true, runValidators : true })
+    if(payload.selfId === "end"){
+    payload.egoId = "1"
+  }  
+  
+  const result = await User.findOneAndUpdate({email : payload.email}, payload, { new : true, runValidators : true })
   return result
 }
+
+
+// const updateAudionInfoIntoDB = async (payload : Partial<TUser> ) =>{
+//   const userData = await User.findOne({email : payload?.email})
+
+//   console.log(userData);
+
+//   console.log(payload);
+
+//   if(userData?.selfId > payload.selfId){
+//     return
+//   }
+  
+
+//   const updateData = {
+//     selfId : payload?.selfId,
+//     category : payload?.category
+//   }
+  
+//   if(payload.selfId === "end"){
+//     const updateData = {
+//       egoId : "1",
+//       category : payload?.category
+//     }        
+//   const result = await User.findOneAndUpdate({email : payload.email}, updateData, { new : true, runValidators : true })
+//   return result
+//   }
+  
+
+//   const result = await User.findOneAndUpdate({email : payload.email}, updateData, { new : true, runValidators : true })
+//   return result
+
+// }
+
+
 
 
 const createUserIntoDB = async (payload: TUser) => {  
