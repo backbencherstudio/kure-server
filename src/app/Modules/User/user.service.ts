@@ -15,7 +15,7 @@ const getSingleUserFromDB = async (email : string) =>{
 }
 
 const updateAudionInfoIntoDB = async (payload : Partial<TUser> ) =>{
-  const userData = await User.findOne({email : payload?.email})
+  const userData = await User.findOne({email : payload?.email})  
 
   if(userData?.selfId === "end"){
     delete payload.selfId
@@ -23,6 +23,14 @@ const updateAudionInfoIntoDB = async (payload : Partial<TUser> ) =>{
     if(payload.selfId === "end"){
     payload.egoId = "1"
   }  
+
+    if(userData?.bodyId === "end"){
+      delete payload.bodyId
+  }  
+    if(payload.bodyId === "end"){
+    payload.mindId = "1"
+  }  
+
   
   const result = await User.findOneAndUpdate({email : payload.email}, payload, { new : true, runValidators : true })
   return result

@@ -8,7 +8,7 @@ export interface TUser {
   Id : number; 
   selfId ?: string;
   egoId ?: string;
-  miendId ?: string;
+  mindId ?: string;
   bodyId ?: string;
   category ?: string;
   otp: string;

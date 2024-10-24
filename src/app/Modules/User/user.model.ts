@@ -20,7 +20,7 @@ const TampUserSchema = new Schema<TampUser>(
       type: Number,
       default : 0
     },
-    miendId: {
+    mindId: {
       type: Number,
       default : 0
     },
@@ -91,7 +91,7 @@ const userSchema = new Schema<TUser>(
       type: String,
       default : "0"
     },
-    miendId: {
+    mindId: {
       type: String,
       default : "0"
     },
