@@ -14,8 +14,24 @@ const getSingleUserFromDB = async (email : string) =>{
   return result
 }
 
-const updateAudionInfoIntoDB = async (payload : Partial<TUser> ) =>{
-  const userData = await User.findOne({email : payload?.email})  
+const updateAudionInfoIntoDB = async (payload : Partial<TUser> ) =>{  
+  
+  const userData = await User.findOne({email : payload?.email})
+  if(!userData){
+    throw new AppError(404, "user not found")
+  }
+
+  const dynamicKey = payload.category === 'body' ? 'bodyId' : 'mindId'; 
+  if (payload[dynamicKey] !== undefined) {
+    const previousIdValue = userData[dynamicKey] || "0"; 
+    payload[dynamicKey] = (parseInt(previousIdValue, 10) + 1).toString(); 
+  }
+    
+  if(payload.selectedMindAudios || payload.selectedBodyAudios ){
+    const result = await User.findOneAndUpdate({email : payload.email}, payload, { new : true, runValidators : true })
+    return result 
+  }
+
   if(userData?.selfId === "end"){
     delete payload.selfId
   }
@@ -27,11 +43,11 @@ const updateAudionInfoIntoDB = async (payload : Partial<TUser> ) =>{
   }  
     if(payload.bodyId === "end"){
     payload.mindId = "1"
-  }    
+  }
+
   const result = await User.findOneAndUpdate({email : payload.email}, payload, { new : true, runValidators : true })
   return result
 }
-
 
 const createUserIntoDB = async (payload: TUser) => {  
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -98,7 +114,6 @@ const purchasePlan = async (payload: Partial<TUser>) => {
   return result;
 };
 
-
 const verifyOTPintoDB = async (email: string, otp: string) => {
   const tempUser = await TampUserCollection.findOne({ email });
   
@@ -132,7 +147,6 @@ const verifyOTPintoDB = async (email: string, otp: string) => {
     message: 'User registered successfully!',
   };
 };
-
 
 const loginUserIntoDB = async (paylod: TLoginUser) => {  
   const userData = await User.findOne({email : paylod.email});
@@ -200,9 +214,6 @@ const refreshToken = async (token: string) => {
     accessToken,
   };
 };
-
-
-
 
 const deleteExpiredUsers = async () => {
     try {

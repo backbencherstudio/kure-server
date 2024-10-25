@@ -23,7 +23,9 @@ export interface TUser {
   expiresDate ?: Date;
   orderID ?: string ;
   payerID ?: string ;
-  createdAt : Date
+  createdAt : Date;
+  selectedBodyAudios ?: number[]
+  selectedMindAudios ?: number[]
 }
 
 // ======================================>>>>>>>> Login Interface

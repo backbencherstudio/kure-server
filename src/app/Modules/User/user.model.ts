@@ -65,7 +65,14 @@ const TampUserSchema = new Schema<TampUser>(
       type: Boolean,
       default: false,
     },
+    selectedBodyAudios : {
+      type : [Number]
+    },
+    selectedMindAudios : {
+      type : [Number]
+    },
     expiresAt: { type: Date, required: true },
+
   },
   {
     timestamps: true,
@@ -135,6 +142,12 @@ const userSchema = new Schema<TUser>(
       type: Boolean,
       default: false,
     },
+    selectedBodyAudios : {
+      type : [Number]
+    },
+    selectedMindAudios : {
+      type : [Number]
+    }
   },
   {
     timestamps: true,
