@@ -27,7 +27,7 @@ const updateAudionInfoIntoDB = async (payload : Partial<TUser> ) =>{
     payload[dynamicKey] = (parseInt(previousIdValue, 10) + 1).toString(); 
   }
     
-  if(payload.selectedMindAudios || payload.selectedBodyAudios ){
+  if((payload.selectedMindAudios && payload.selectedBodyAudios) || (payload.selectedEgoAudios && payload.selectedSelfAudios)  ){
     const result = await User.findOneAndUpdate({email : payload.email}, payload, { new : true, runValidators : true })
     return result 
   }
@@ -47,6 +47,7 @@ const updateAudionInfoIntoDB = async (payload : Partial<TUser> ) =>{
 
   const result = await User.findOneAndUpdate({email : payload.email}, payload, { new : true, runValidators : true })
   return result
+
 }
 
 const createUserIntoDB = async (payload: TUser) => {  

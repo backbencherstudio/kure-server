@@ -26,6 +26,8 @@ export interface TUser {
   createdAt : Date;
   selectedBodyAudios ?: number[]
   selectedMindAudios ?: number[]
+  selectedSelfAudios ?: number[]
+  selectedEgoAudios ?: number[]
 }
 
 // ======================================>>>>>>>> Login Interface

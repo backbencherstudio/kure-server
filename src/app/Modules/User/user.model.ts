@@ -71,6 +71,12 @@ const TampUserSchema = new Schema<TampUser>(
     selectedMindAudios : {
       type : [Number]
     },
+    selectedEgoAudios : {
+      type : [Number]
+    },
+    selectedSelfAudios : {
+      type : [Number]
+    },
     expiresAt: { type: Date, required: true },
 
   },
@@ -147,7 +153,13 @@ const userSchema = new Schema<TUser>(
     },
     selectedMindAudios : {
       type : [Number]
-    }
+    },
+    selectedEgoAudios : {
+      type : [Number]
+    },
+    selectedSelfAudios : {
+      type : [Number]
+    },
   },
   {
     timestamps: true,
