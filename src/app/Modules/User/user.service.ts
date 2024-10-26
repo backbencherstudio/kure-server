@@ -14,41 +14,159 @@ const getSingleUserFromDB = async (email : string) =>{
   return result
 }
 
-const updateAudionInfoIntoDB = async (payload : Partial<TUser> ) =>{  
+
+// const updateAudionInfoIntoDB = async (payload : Partial<TUser> ) =>{  
+
+//   console.log(payload);
   
-  const userData = await User.findOne({email : payload?.email})
-  if(!userData){
-    throw new AppError(404, "user not found")
+  
+//   const userData = await User.findOne({email : payload?.email})
+//   if(!userData){
+//     throw new AppError(404, "user not found")
+//   }
+
+//   const dynamicKey = payload.category === 'body' ? 'bodyId' : 'mindId'; 
+//   const dynamicKey = payload.category === 'self' ? 'selfId' : 'egoId'; 
+//   if (payload[dynamicKey] !== undefined) {
+//     const previousIdValue = userData[dynamicKey] || "0"; 
+//     payload[dynamicKey] = (parseInt(previousIdValue, 10) + 1).toString(); 
+//   }
+
+//   console.log(payload);
+  
+  
+//   if((payload.selectedMindAudios && payload.selectedBodyAudios) || (payload.selectedEgoAudios && payload.selectedSelfAudios)  ){
+//     const result = await User.findOneAndUpdate({email : payload.email}, payload, { new : true, runValidators : true })
+//     return result 
+//   }
+
+//   if(userData?.selfId === "end"){
+//     delete payload.selfId
+//   }
+//     if(payload.selfId === "end"){
+//     payload.egoId = "1"
+//   }  
+//     if(userData?.bodyId === "end"){
+//       delete payload.bodyId
+//   }  
+//     if(payload.bodyId === "end"){
+//     payload.mindId = "1"
+//   }
+
+//   const result = await User.findOneAndUpdate({email : payload.email}, payload, { new : true, runValidators : true })
+//   return result
+
+// }
+
+// const updateAudionInfoIntoDB = async (payload: Partial<TUser>) => { 
+//   const userData = await User.findOne({ email: payload?.email });
+//   if (!userData) {
+//     throw new AppError(404, "user not found");
+//   }
+
+//   let dynamicKey: keyof TUser | undefined;
+//   if (payload.category === 'body') {
+//     dynamicKey = 'bodyId';
+//   } else if (payload.category === 'mind') {
+//     dynamicKey = 'mindId';
+//   } else if (payload.category === 'self') {
+//     dynamicKey = 'selfId';
+//   } else if (payload.category === 'ego') {
+//     dynamicKey = 'egoId';
+//   }
+
+//   if (dynamicKey && payload[dynamicKey as keyof TUser] !== undefined) {
+//     const previousIdValue = userData[dynamicKey] || "0"; 
+//     payload[dynamicKey] = (parseInt(previousIdValue, 10) + 1).toString(); 
+//   }
+
+//   if ((payload.selectedMindAudios && payload.selectedBodyAudios) || 
+//       (payload.selectedEgoAudios && payload.selectedSelfAudios)) {
+//     const result = await User.findOneAndUpdate(
+//       { email: payload.email },
+//       payload,
+//       { new: true, runValidators: true }
+//     );
+//     return result;
+//   }
+
+//   if (userData?.selfId === "end") {
+//     delete payload.selfId;
+//   }
+//   if (payload.selfId === "end") {
+//     payload.egoId = "1";
+//   }
+//   if (userData?.bodyId === "end") {
+//     delete payload.bodyId;
+//   }
+//   if (payload.bodyId === "end") {
+//     payload.mindId = "1";
+//   }
+
+//   const result = await User.findOneAndUpdate(
+//     { email: payload.email },
+//     payload,
+//     { new: true, runValidators: true }
+//   );
+//   return result;
+// };
+
+const updateAudionInfoIntoDB = async (payload: Partial<TUser>) => {
+  const userData = await User.findOne({ email: payload?.email });
+  if (!userData) {
+    throw new AppError(404, "user not found");
   }
 
-  const dynamicKey = payload.category === 'body' ? 'bodyId' : 'mindId'; 
-  if (payload[dynamicKey] !== undefined) {
-    const previousIdValue = userData[dynamicKey] || "0"; 
-    payload[dynamicKey] = (parseInt(previousIdValue, 10) + 1).toString(); 
-  }
-    
-  if((payload.selectedMindAudios && payload.selectedBodyAudios) || (payload.selectedEgoAudios && payload.selectedSelfAudios)  ){
-    const result = await User.findOneAndUpdate({email : payload.email}, payload, { new : true, runValidators : true })
-    return result 
-  }
-
-  if(userData?.selfId === "end"){
-    delete payload.selfId
-  }
-    if(payload.selfId === "end"){
-    payload.egoId = "1"
-  }  
-    if(userData?.bodyId === "end"){
-      delete payload.bodyId
-  }  
-    if(payload.bodyId === "end"){
-    payload.mindId = "1"
+  // Correct the dynamic key based on category
+  let dynamicKey: keyof TUser | undefined;
+  if (payload.category === 'body') {
+    dynamicKey = 'bodyId';
+  } else if (payload.category === 'mind') {
+    dynamicKey = 'mindId';
+  } else if (payload.category === 'self') {
+    dynamicKey = 'selfId';
+  } else if (payload.category === 'ego') {
+    dynamicKey = 'egoId';
   }
 
-  const result = await User.findOneAndUpdate({email : payload.email}, payload, { new : true, runValidators : true })
-  return result
+  if (dynamicKey && payload[dynamicKey] !== undefined) {
+    const previousIdValue = userData[dynamicKey] || "0";
+    payload[dynamicKey] = (parseInt(previousIdValue, 10) + 1).toString() as any; 
+  }
 
-}
+  if ((payload.selectedMindAudios && payload.selectedBodyAudios) || 
+      (payload.selectedEgoAudios && payload.selectedSelfAudios)) {
+    const result = await User.findOneAndUpdate(
+      { email: payload.email },
+      payload,
+      { new: true, runValidators: true }
+    );
+    return result;
+  }
+
+  if (userData?.selfId === "end") {
+    delete payload.selfId;
+  }
+  if (payload.selfId === "end") {
+    payload.egoId = "1";
+  }
+  if (userData?.bodyId === "end") {
+    delete payload.bodyId;
+  }
+  if (payload.bodyId === "end") {
+    payload.mindId = "1";
+  }
+
+  const result = await User.findOneAndUpdate(
+    { email: payload.email },
+    payload,
+    { new: true, runValidators: true }
+  );
+  return result;
+};
+
+
+
 
 const createUserIntoDB = async (payload: TUser) => {  
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
