@@ -354,7 +354,7 @@ const deleteExpiredUsers = async () => {
 
 setInterval(() => {
   deleteExpiredUsers();
-}, 30 * 60 * 1000);
+}, 24 * 60 * 60 * 1000);
 
   export const UserServices = {
     getSingleUserFromDB,
