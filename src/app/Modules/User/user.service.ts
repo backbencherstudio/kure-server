@@ -67,6 +67,21 @@ const updateAudionInfoIntoDB = async (payload: Partial<TUser>) => {
   return result;
 };
 
+const logOutUpdateIntoDB = async ( email : string )=>{
+  const payload = {
+    selectedBodyAudios : [],
+    selectedMindAudios : [],
+    selectedEgoAudios : [],
+    selectedSelfAudios : []
+  }
+  const result = await User.findOneAndUpdate(
+    { email },
+    payload,
+    { new: true, runValidators: true }
+  );
+  return result;
+}
+
 const createUserIntoDB = async (payload: TUser) => {  
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const expirationTime = new Date(Date.now() + 2 * 60 * 1000);
@@ -251,6 +266,8 @@ const deleteExpiredUsers = async () => {
 };
 
 
+
+
 setInterval(() => {
   deleteExpiredUsers();
 }, 24 * 60 * 60 * 1000);
@@ -262,5 +279,6 @@ setInterval(() => {
     verifyOTPintoDB,
     loginUserIntoDB,
     purchasePlan,
-    refreshToken
+    refreshToken,
+    logOutUpdateIntoDB
   };

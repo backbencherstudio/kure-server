@@ -21,6 +21,11 @@ router.post(
 );
 
 router.patch(
+  '/log-out-update',
+  userController.logOutUpdate,
+);
+
+router.patch(
   '/purchasePlan',
   userController.purchasePlanController,
 );

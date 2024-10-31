@@ -91,6 +91,18 @@ const verifyOTP = catchAsync(async (req, res) => {
 });
 
 
+const logOutUpdate = catchAsync(async (req, res) => {
+  const { email } = req.body;
+  const result = await UserServices.logOutUpdateIntoDB(email);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Log Out successFully',
+    data: result,
+  });
+});
+
+
 export const userController = {
   getSingleUser,
   updateAudio,
@@ -98,5 +110,6 @@ export const userController = {
   loginUser,
   verifyOTP,
   refreshToken,
-  purchasePlanController
+  purchasePlanController,
+  logOutUpdate
 };
