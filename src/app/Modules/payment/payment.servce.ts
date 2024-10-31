@@ -8,9 +8,14 @@ import { TPaymentAmount } from "./payment.interface";
 
 paypal.configure({
     'mode': 'sandbox', 
-    'client_id': 'AeMnBMlrboT2yZ77Ny1Zuwm-UnhJeeMzvE1D1ana1ZetUAzPfo7C-Px41iR4FijH5SN1FHEYrGokg3G2',
-    'client_secret': 'EJkWItnQryzrdRMgIyVw8oJ1tgQBpWCe7EVTdoI2_EqLVIWO-xI_mX40IfFX6DUUxPLMIs6Sy2r2SVfr'
+    'client_id': 'AUHCLLlrN0fUteHTIYiBX7ZOoduVvF0mp4QSDUQOf_m2GohS_kVr6z8CbTJgOMnGNyMAiLsx_EWf8l5C',
+    'client_secret': 'EDwN_-iERzhwDKJJ4x84VM3V03dWv4laHpF21fnDvmPup5a-PWvv8poGghba6XvtydL0V04iwjIag63z'
 });
+// paypal.configure({
+//     'mode': 'sandbox', 
+//     'client_id': 'AeMnBMlrboT2yZ77Ny1Zuwm-UnhJeeMzvE1D1ana1ZetUAzPfo7C-Px41iR4FijH5SN1FHEYrGokg3G2',
+//     'client_secret': 'EJkWItnQryzrdRMgIyVw8oJ1tgQBpWCe7EVTdoI2_EqLVIWO-xI_mX40IfFX6DUUxPLMIs6Sy2r2SVfr'
+// });
 
 const paymentFun = (amount: TPaymentAmount): Promise<{ forwardLink: string }> => {
 
@@ -64,7 +69,8 @@ const executePaymentFun = (orderID : string, payerID : string) => {
     });
 };
 
-const stripe = new Stripe('sk_test_51NFvq6ArRmO7hNaVBU6gVxCbaksurKb6Sspg6o8HePfktRB4OQY6kX5qqcQgfxnLnJ3w9k2EA0T569uYp8DEcfeq00KXKRmLUw');
+// const stripe = new Stripe('sk_test_51NFvq6ArRmO7hNaVBU6gVxCbaksurKb6Sspg6o8HePfktRB4OQY6kX5qqcQgfxnLnJ3w9k2EA0T569uYp8DEcfeq00KXKRmLUw');
+const stripe = new Stripe('sk_test_51QFpATLEvlBZD5dJjsneUWfIN2W2ok3yfxHN7qyLB2TRPYn0bs0UCzWytfZgZwrpcboY5GXMyen4BwCPthGLCrRX001T5gDgLK');
 
 
 const stripePayment = async (amount: number) => {   

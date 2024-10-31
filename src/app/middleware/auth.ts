@@ -7,8 +7,7 @@ import { User } from '../Modules/User/user.model';
 
 export const Auth = () => {
   return catchAsync(async (req, res, next) => {
-    const token = req?.headers?.authorization;
-    
+    const token = req?.headers?.authorization;    
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorize!!');
     }
