@@ -183,7 +183,6 @@ const verifyOTPintoDB = async (email: string, otp: string) => {
 
 const loginUserIntoDB = async (paylod: TLoginUser) => {  
   const userData = await User.findOne({email : paylod.email});
-
   if (!userData) {
     throw new AppError(httpStatus.NOT_FOUND, 'User is not found');
   }
