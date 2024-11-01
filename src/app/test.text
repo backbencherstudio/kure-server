@@ -121,5 +121,5 @@ export const PaymentServices = {
     paymentFun,
     executePaymentFun,
     stripePayment,
-    createPayout 
+    createPayout // Added this line
 };
