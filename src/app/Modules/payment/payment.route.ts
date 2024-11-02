@@ -5,7 +5,6 @@ const router = express.Router();
 
 router.post('/', paymentController.paymentControl);
 
-router.post('/withdraw', paymentController.paymentWithdrowWithPaypal);
 
 router.post('/execute-payment', paymentController.executePaymentControl);
 

@@ -35,21 +35,10 @@ const paymentWithStripe = catchAsync(async (req, res) => {
     });
 });
 
-const paymentWithdrowWithPaypal = catchAsync(async (req, res) => {
-    const { amount, email } = req.body;    
-    const result = await PaymentServices.createPayout(amount, email);
-    res.status(httpStatus.OK).json({
-        success: true,
-        message: 'Payment intent created successfully',
-        data: result,
-    });
-});
-
 
 
 export const paymentController = {
     paymentControl,
     executePaymentControl,
     paymentWithStripe,
-    paymentWithdrowWithPaypal
 };

@@ -1,20 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from "http-status";
-import paypalRest from "paypal-rest-sdk";
-import paypalPayouts from '@paypal/payouts-sdk';
+import paypal from "paypal-rest-sdk";
 import { AppError } from "../../errors/AppErrors";
 import Stripe from "stripe";
 import { TPaymentAmount } from "./payment.interface";
 
-// Configure the PayPal REST SDK
-paypalRest.configure({
+
+paypal.configure({
     'mode': 'sandbox', 
     'client_id': 'AUHCLLlrN0fUteHTIYiBX7ZOoduVvF0mp4QSDUQOf_m2GohS_kVr6z8CbTJgOMnGNyMAiLsx_EWf8l5C',
     'client_secret': 'EDwN_-iERzhwDKJJ4x84VM3V03dWv4laHpF21fnDvmPup5a-PWvv8poGghba6XvtydL0V04iwjIag63z'
 });
 
-// Payment function using paypal-rest-sdk
 const paymentFun = (amount: TPaymentAmount): Promise<{ forwardLink: string }> => {
+
     return new Promise((resolve, reject) => {
         const create_payment_json = {
             "intent": "sale",
@@ -34,7 +33,7 @@ const paymentFun = (amount: TPaymentAmount): Promise<{ forwardLink: string }> =>
             }]
         };
 
-        paypalRest.payment.create(create_payment_json, (error, payment) => {
+        paypal.payment.create(create_payment_json, (error, payment) => {
             if (error) {
                 reject(new AppError(httpStatus.BAD_REQUEST, error.message));
             } else if (payment && payment.links) {
@@ -51,10 +50,9 @@ const paymentFun = (amount: TPaymentAmount): Promise<{ forwardLink: string }> =>
     });
 };
 
-// Execute payment function using paypal-rest-sdk
 const executePaymentFun = (orderID : string, payerID : string) => {  
     return new Promise((resolve, reject) => {
-        paypalRest.payment.execute(orderID, {
+        paypal.payment.execute(orderID, {
             payer_id: payerID  
         }, (error, payment) => {
             if (error) {
@@ -66,13 +64,13 @@ const executePaymentFun = (orderID : string, payerID : string) => {
     });
 };
 
-// Configure Stripe
 const stripe = new Stripe('sk_test_51QFpATLEvlBZD5dJjsneUWfIN2W2ok3yfxHN7qyLB2TRPYn0bs0UCzWytfZgZwrpcboY5GXMyen4BwCPthGLCrRX001T5gDgLK');
+
 
 const stripePayment = async (amount: number) => {   
     try {
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: amount * 100, 
+            amount: amount  * 100, 
             currency: 'usd',
             payment_method_types: ['card'],
         });
@@ -82,44 +80,9 @@ const stripePayment = async (amount: number) => {
     }
 };
 
-// Configure PayPal payouts SDK
-const environment = new paypalPayouts.core.SandboxEnvironment('AUHCLLlrN0fUteHTIYiBX7ZOoduVvF0mp4QSDUQOf_m2GohS_kVr6z8CbTJgOMnGNyMAiLsx_EWf8l5C', 'EDwN_-iERzhwDKJJ4x84VM3V03dWv4laHpF21fnDvmPup5a-PWvv8poGghba6XvtydL0V04iwjIag63z');
-const client = new paypalPayouts.core.PayPalHttpClient(environment);
 
-// Create payout function using @paypal/payouts-sdk
-export const createPayout = async (amount : any, recipientEmail : any) => {
-    const request = new paypalPayouts.payouts.PayoutsPostRequest();
-    request.requestBody({
-        sender_batch_header: {
-            sender_batch_id: `Payout-${Math.random().toString(36).substr(2, 9)}`,
-            email_subject: 'You have a payout!',
-        },
-        items: [
-            {
-                recipient_type: 'EMAIL',
-                amount: {
-                    value: amount,
-                    currency: 'USD',
-                },
-                receiver: recipientEmail,
-                note: 'Thanks for your business!',
-                sender_item_id: 'item-1',
-            },
-        ],
-    });
-
-    try {
-        const response = await client.execute(request);
-        return response.result;
-    } catch (error : any) {
-        throw new Error(error.message);
-    }
-};
-
-// Export the services
 export const PaymentServices = {
     paymentFun,
     executePaymentFun,
-    stripePayment,
-    createPayout 
+    stripePayment
 };
