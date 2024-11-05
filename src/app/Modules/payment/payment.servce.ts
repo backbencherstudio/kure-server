@@ -13,7 +13,6 @@ paypal.configure({
 });
 
 const paymentFun = (amount: TPaymentAmount): Promise<{ forwardLink: string }> => {
-
     return new Promise((resolve, reject) => {
         const create_payment_json = {
             "intent": "sale",
@@ -32,7 +31,6 @@ const paymentFun = (amount: TPaymentAmount): Promise<{ forwardLink: string }> =>
                 "description": "This is the payment description."
             }]
         };
-
         paypal.payment.create(create_payment_json, (error, payment) => {
             if (error) {
                 reject(new AppError(httpStatus.BAD_REQUEST, error.message));
@@ -64,8 +62,9 @@ const executePaymentFun = (orderID : string, payerID : string) => {
     });
 };
 
-const stripe = new Stripe('sk_test_51QFpATLEvlBZD5dJjsneUWfIN2W2ok3yfxHN7qyLB2TRPYn0bs0UCzWytfZgZwrpcboY5GXMyen4BwCPthGLCrRX001T5gDgLK');
 
+
+const stripe = new Stripe('sk_test_51QFpATLEvlBZD5dJjsneUWfIN2W2ok3yfxHN7qyLB2TRPYn0bs0UCzWytfZgZwrpcboY5GXMyen4BwCPthGLCrRX001T5gDgLK');
 
 const stripePayment = async (amount: number) => {   
     try {
@@ -81,8 +80,26 @@ const stripePayment = async (amount: number) => {
 };
 
 
-export const PaymentServices = {
+const stripeWithdraw = async (connectedAccountId: string, amount: any) => {
+    console.log("Connected Account ID:", connectedAccountId);
+    console.log("Amount:", amount);
+
+    try {
+        const transfer = await stripe.transfers.create({
+            amount: amount * 100, // Ensure this is in cents
+            currency: 'usd',
+            destination: connectedAccountId,
+        });
+        return transfer;
+    } catch (error: any) {
+        console.error("Error in stripeWithdraw:", error.message);
+        throw new AppError(httpStatus.BAD_REQUEST, error.message);
+    }
+};
+
+export const PaymentServices = {    
     paymentFun,
     executePaymentFun,
-    stripePayment
+    stripePayment,
+    stripeWithdraw
 };

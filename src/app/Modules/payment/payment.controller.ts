@@ -35,10 +35,22 @@ const paymentWithStripe = catchAsync(async (req, res) => {
     });
 });
 
+const paymentWithdrowWithStripe = catchAsync(async (req, res) => {
+    const { connectedAccountId, amount } = req.body; 
+    
+    const result = await PaymentServices.stripeWithdraw(connectedAccountId, amount);
+    res.status(httpStatus.OK).json({
+        success: true,
+        message: 'Payment intent created successfully',
+        data: result,
+    });
+});
+
 
 
 export const paymentController = {
-    paymentControl,
+    paymentControl, 
     executePaymentControl,
     paymentWithStripe,
+    paymentWithdrowWithStripe
 };
