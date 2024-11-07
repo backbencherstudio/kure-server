@@ -7,6 +7,7 @@ import { TPaymentAmount } from "./payment.interface";
 
 
 paypal.configure({
+    // 'mode': 'live', 
     'mode': 'sandbox', 
     'client_id': 'AUHCLLlrN0fUteHTIYiBX7ZOoduVvF0mp4QSDUQOf_m2GohS_kVr6z8CbTJgOMnGNyMAiLsx_EWf8l5C',
     'client_secret': 'EDwN_-iERzhwDKJJ4x84VM3V03dWv4laHpF21fnDvmPup5a-PWvv8poGghba6XvtydL0V04iwjIag63z'
@@ -80,26 +81,9 @@ const stripePayment = async (amount: number) => {
 };
 
 
-const stripeWithdraw = async (connectedAccountId: string, amount: any) => {
-    console.log("Connected Account ID:", connectedAccountId);
-    console.log("Amount:", amount);
-
-    try {
-        const transfer = await stripe.transfers.create({
-            amount: amount * 100, // Ensure this is in cents
-            currency: 'usd',
-            destination: connectedAccountId,
-        });
-        return transfer;
-    } catch (error: any) {
-        console.error("Error in stripeWithdraw:", error.message);
-        throw new AppError(httpStatus.BAD_REQUEST, error.message);
-    }
-};
 
 export const PaymentServices = {    
     paymentFun,
     executePaymentFun,
     stripePayment,
-    stripeWithdraw
 };
