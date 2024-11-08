@@ -13,5 +13,6 @@ export default {
   jwt_access_expires_in: process.env.JWT_ACCESS_EXPIRES_IN,
   jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN,  
   email_pass:process.env.EMAIL_PASS,
-  email_port:process.env.EMAIL_PORT
+  email_port:process.env.EMAIL_PORT,
+  client_base_url:process.env.CLIENT_BASE_URL
 };

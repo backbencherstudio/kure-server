@@ -3,16 +3,16 @@ import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { PaymentServices } from "./payment.servce";
 
-const paymentControl = catchAsync(async (req, res) => {
-    const { amount } = req.body;
-    const result = await PaymentServices.paymentFun(amount); 
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: 'Payment created successfully',
-        data: result,
-    });
-});
+// const paymentControl = catchAsync(async (req, res) => {
+//     const { amount } = req.body;
+//     const result = await PaymentServices.paymentFun(amount); 
+//     sendResponse(res, {
+//         statusCode: httpStatus.OK,
+//         success: true,
+//         message: 'Payment created successfully',
+//         data: result,
+//     });
+// });
 
 const executePaymentControl = catchAsync(async (req, res) => {
     const { orderID, payerID } = req.body;      
@@ -36,10 +36,8 @@ const paymentWithStripe = catchAsync(async (req, res) => {
 });
 
 
-
-
 export const paymentController = {
-    paymentControl, 
+    // paymentControl, 
     executePaymentControl,
     paymentWithStripe,
 };

@@ -3,7 +3,7 @@ import httpStatus from "http-status";
 import paypal from "paypal-rest-sdk";
 import { AppError } from "../../errors/AppErrors";
 import Stripe from "stripe";
-import { TPaymentAmount } from "./payment.interface";
+// import { TPaymentAmount } from "./payment.interface";
 
 
 paypal.configure({
@@ -13,43 +13,7 @@ paypal.configure({
     'client_secret': 'EDwN_-iERzhwDKJJ4x84VM3V03dWv4laHpF21fnDvmPup5a-PWvv8poGghba6XvtydL0V04iwjIag63z'
 });
 
-const paymentFun = (amount: TPaymentAmount): Promise<{ forwardLink: string }> => {
-    return new Promise((resolve, reject) => {
-        const create_payment_json = {
-            "intent": "sale",
-            "payer": {
-                "payment_method": "paypal"
-            },
-            "redirect_urls": {
-                "return_url": "http://localhost:5173/success",
-                "cancel_url": "http://localhost:5173/cancel"
-            },
-            "transactions": [{
-                "amount": {
-                    "currency": "USD",
-                    "total": amount.toString()
-                },
-                "description": "This is the payment description."
-            }]
-        };
-        paypal.payment.create(create_payment_json, (error, payment) => {
-            if (error) {
-                reject(new AppError(httpStatus.BAD_REQUEST, error.message));
-            } else if (payment && payment.links) {
-                const forwardLink = payment.links.find((link: any) => link.rel === 'approval_url')?.href;
-                if (forwardLink) {
-                    resolve({ forwardLink });
-                } else {
-                    reject(new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Approval URL not found.'));
-                }
-            } else {
-                reject(new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Payment object or links is undefined.'));
-            }
-        });
-    });
-};
-
-const executePaymentFun = (orderID : string, payerID : string) => {  
+const executePaymentFun = (orderID : string, payerID : string) => {
     return new Promise((resolve, reject) => {
         paypal.payment.execute(orderID, {
             payer_id: payerID  
@@ -62,7 +26,6 @@ const executePaymentFun = (orderID : string, payerID : string) => {
         });
     });
 };
-
 
 
 const stripe = new Stripe('sk_test_51QFpATLEvlBZD5dJjsneUWfIN2W2ok3yfxHN7qyLB2TRPYn0bs0UCzWytfZgZwrpcboY5GXMyen4BwCPthGLCrRX001T5gDgLK');
@@ -82,8 +45,9 @@ const stripePayment = async (amount: number) => {
 
 
 
+
 export const PaymentServices = {    
-    paymentFun,
+    // paymentFun,
     executePaymentFun,
     stripePayment,
 };
