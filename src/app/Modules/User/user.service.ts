@@ -123,20 +123,20 @@ const createUserIntoDB = async (payload: TUser) => {
   };
 };
 
-const purchasePlan = async (payload: Partial<TUser>) => {
-  const day = parseInt(payload.plan|| "0", 10);  
+const purchasePlan = async (payload: Partial<TUser>) => {  
+  // const day = parseInt(payload.plan|| "0", 10);  
 
-  const currentDate = new Date();
-  const expiresDate = new Date(currentDate.setDate(currentDate.getDate() + day));
+  // const currentDate = new Date();
+  // const expiresDate = new Date(currentDate.setDate(currentDate.getDate() + day));
 
   const updateData = {
     $set: {
-      plan: payload.plan,
-      price: payload.price,
-      userType: payload.userType,
-      expiresDate,
-      orderID : payload.orderID || "" ,
-      payerID : payload.payerID || "",
+      // plan: payload.plan,
+      // price: payload.price,
+      // userType: payload.userType,
+      // expiresDate,
+      // orderID : payload.orderID || "" ,
+      // payerID : payload.payerID || "",
       sessionId : payload.sessionId || "",
     },
   };
@@ -196,8 +196,8 @@ const loginUserIntoDB = async (paylod: TLoginUser) => {
   const jwtPayload = {
     email: userData.email,
     name: userData.name ,
-    userType : userData.userType,
-    expiresDate : userData.expiresDate,
+    userType : userData.userType,    
+    sessionId : userData. sessionId,
     createdAt : userData.createdAt
   };
   

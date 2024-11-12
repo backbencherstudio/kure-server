@@ -5,7 +5,7 @@ export const createToken = (
     email: string;
     name : string;
     userType : string | undefined;
-    expiresDate : Date | undefined ;
+    sessionId : string | undefined ;
     createdAt : Date | undefined ;
   },
   secret: string,

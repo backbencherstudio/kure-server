@@ -78,8 +78,7 @@ app.get('/success', async (req, res) => {
     subscription_email : session?.customer_details?.email,
     plan : (session?.subscription.plan.amount / 100),
     status : session?.subscription.status
-  }
-  
+  } 
 
   res.send(sessionData);
 });
