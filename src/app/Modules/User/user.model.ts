@@ -145,6 +145,7 @@ const userSchema = new Schema<TUser>(
     },
     orderID : { type : String, default : "" },
     payerID : { type : String, default : "" },
+    sessionId : { type : String, default : "" },
     expiresDate: {
       type: Date,
     },

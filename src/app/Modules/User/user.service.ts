@@ -137,6 +137,7 @@ const purchasePlan = async (payload: Partial<TUser>) => {
       expiresDate,
       orderID : payload.orderID || "" ,
       payerID : payload.payerID || "",
+      sessionId : payload.sessionId || "",
     },
   };
   const result = await User.findOneAndUpdate(
@@ -147,7 +148,7 @@ const purchasePlan = async (payload: Partial<TUser>) => {
   return result;
 };
 
-const verifyOTPintoDB = async (email: string, otp: string) => {
+const verifyOTPintoDB = async (email: string, otp: string, userType: any) => {
   const tempUser = await TampUserCollection.findOne({ email });
   
   if (!tempUser) {
@@ -170,6 +171,7 @@ const verifyOTPintoDB = async (email: string, otp: string) => {
     email: tempUser.email,
     password: tempUser.password,
     name: tempUser.name,
+    userType
   };
 
   await User.create(newUserData);

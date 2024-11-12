@@ -24,6 +24,7 @@ export interface TUser {
   orderID ?: string ;
   payerID ?: string ;
   createdAt : Date;
+  sessionId ?: string;
   selectedBodyAudios ?: number[]
   selectedMindAudios ?: number[]
   selectedSelfAudios ?: number[]

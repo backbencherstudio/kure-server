@@ -80,8 +80,8 @@ const refreshToken = catchAsync(async (req, res) => {
 
 
 const verifyOTP = catchAsync(async (req, res) => {
-  const { email, otp } = req.body;
-  const result = await UserServices.verifyOTPintoDB(email, otp);
+  const { email, otp, userType } = req.body;
+  const result = await UserServices.verifyOTPintoDB(email, otp, userType);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
