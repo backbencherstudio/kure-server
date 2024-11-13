@@ -59,9 +59,6 @@ app.get('/subscribe', async (req, res) => {
     cancel_url: `${config.client_base_url}/subscriptionplan`,
   });
     
-  
-  // console.log(51, session?.payment_method_configuration_details);
-
   res.redirect(session.url);
 });
 
@@ -92,20 +89,11 @@ app.get("/customers/:customerId", async(req, res)=>{
     customer : req.params.customerId,
     return_url : `${config.client_base_url}`
   })
-
-  // console.log(88, {portalSession});
-
   res.redirect(portalSession.url)
 } )
 
 app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
-  const sig = req.headers['stripe-signature'];
-
-  // console.log(107, req.body.data.object.hosted_invoice_url);
-  // console.log(108, req.body.data.object.invoice_pdf);
-  // console.log(109, req.body.data);
-
-  
+  const sig = req.headers['stripe-signature'];  
   let event;
   try {
       event = stripe.webhooks.constructEvent(req.body, sig, config.stripe_webhook_secret_key);
@@ -113,9 +101,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
       return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // Handle the event
   switch (event.type) {
-    //Event when the subscription started
     case 'checkout.session.completed':
       console.log('New Subscription started!')
       console.log(116, event.data)

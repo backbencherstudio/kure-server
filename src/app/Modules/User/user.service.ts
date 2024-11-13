@@ -141,7 +141,6 @@ const purchasePlan = async (payload: Partial<TUser>) => {
         sessionId : payload.sessionId || "",
       },
     };
-
     const result = await User.findOneAndUpdate(
       { email: payload.email },
       updateData,
@@ -162,8 +161,6 @@ const purchasePlan = async (payload: Partial<TUser>) => {
     );
     return result;    
   }
-
-
 };
 
 const verifyOTPintoDB = async (email: string, otp: string, userType: any) => {
