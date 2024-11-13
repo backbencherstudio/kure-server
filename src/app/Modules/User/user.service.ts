@@ -124,28 +124,46 @@ const createUserIntoDB = async (payload: TUser) => {
 };
 
 const purchasePlan = async (payload: Partial<TUser>) => {  
+  const userData = await User.findOne({email : payload?.email});
   // const day = parseInt(payload.plan|| "0", 10);  
 
   // const currentDate = new Date();
   // const expiresDate = new Date(currentDate.setDate(currentDate.getDate() + day));
+  
+  
+  if(userData?.sessionId !== payload.sessionId ){
+    const  updateData = {
+      $set: {
+        selectedBodyAudios : [],
+        selectedMindAudios : [],
+        selectedEgoAudios : [],
+        selectedSelfAudios : [],
+        sessionId : payload.sessionId || "",
+      },
+    };
 
-  const updateData = {
-    $set: {
-      // plan: payload.plan,
-      // price: payload.price,
-      // userType: payload.userType,
-      // expiresDate,
-      // orderID : payload.orderID || "" ,
-      // payerID : payload.payerID || "",
-      sessionId : payload.sessionId || "",
-    },
-  };
-  const result = await User.findOneAndUpdate(
-    { email: payload.email },
-    updateData,
-    { new: true, runValidators: true }
-  );
-  return result;
+    const result = await User.findOneAndUpdate(
+      { email: payload.email },
+      updateData,
+      { new: true, runValidators: true }
+    );
+    return result;
+  }
+  else{
+    const  updateData = {
+      $set: {
+        sessionId : payload.sessionId || "",
+      },
+    };
+    const result = await User.findOneAndUpdate(
+      { email: payload.email },
+      updateData,
+      { new: true, runValidators: true }
+    );
+    return result;    
+  }
+
+
 };
 
 const verifyOTPintoDB = async (email: string, otp: string, userType: any) => {

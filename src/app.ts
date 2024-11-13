@@ -54,7 +54,7 @@ app.get('/subscribe', async (req, res) => {
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     line_items: [{ price: priceId, quantity: 1 }],
-    // success_url: `${config.client_base_url}/success?session_id={CHECKOUT_SESSION_ID}`,
+    // success_url: `${config.client_base_url}/login`,
     success_url: `${config.client_base_url}/daily-audios?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${config.client_base_url}/subscriptionplan`,
   });
@@ -70,8 +70,6 @@ app.get('/success', async (req, res) => {
   const session = await stripe.checkout.sessions.retrieve(req.query.session_id, { 
     expand: ['subscription', 'subscription.plan.product'] 
   });
-
-  // console.log({session});  
  
   const sessionData = {
     customer_id : session?.subscription?.customer,
