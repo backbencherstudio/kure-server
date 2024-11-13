@@ -1,91 +1,54 @@
-/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { Application } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import multer from 'multer';
-import path from 'path';
 import Stripe from 'stripe';
 import config from './app/config';
-import { pathName } from './app/Modules/audioPath/audiopath.module';  // MongoDB model for audio file URLs
 import router from './app/routes';
+import multer  from "multer"
 
 const app: Application = express();
 const stripe = new Stripe(config.stripe_test_secret_key as string);
 
-// Setup CORS and middlewares
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ['http://localhost:5173'],  
+    origin: ['http://localhost:5173'], 
     credentials: true,
-  })
+  }),
 );
+
 app.use("/api/v1", router)
 
-
-app.use('/uploads', express.static('uploads'));  
-
-app.get('/get-audios', async (req, res) => {
-  try {
-    const audios = await pathName.find(); 
-    const audioUrls = audios.map(audio => audio.path);  
-
-    res.status(200).json(audioUrls);
-  } catch (err) {
-    console.error('Error fetching audio URLs:', err);
-    res.status(500).json({ message: 'Error fetching audio URLs' });
-  }
+app.get('/test', async (req, res) => {
+  res.send('Server Running Successfully');
 });
+
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); 
+    cb(null, 'uploads/'); // specify the folder where files will be uploaded
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+    cb(null, Date.now() + path.extname(file.originalname)); // unique file name
   },
 });
 
 const upload = multer({ storage: storage });
 
-app.post('/upload-audio', upload.single('audio'), async (req, res) => {
+// Route to handle file upload
+app.post('/upload-audio', upload.single('audio'), (req, res) => {
   if (!req.file) {
     return res.status(400).send('No file uploaded');
   }
-
-  try {
-    const newAudioUrl = `/uploads/${req.file.filename}`;
-    res.status(200).send({ filePath: newAudioUrl });
-  } catch (err) {
-    console.error('Error saving audio URL:', err);
-    res.status(500).send('Error saving audio URL');
-  }
+  res.status(200).send({ filePath: `/uploads/${req.file.filename}` });
 });
 
-app.post("/path-name", async (req, res) => {
-  const { pathName: path } = req.body;  
-  if(path){
-    const result = await pathName.create({ pathName : path });
-    res.send(result);
-    return
-  } 
-});
+// Serve static files in the uploads folder
+app.use('/uploads', express.static('uploads'));
 
 
-app.get("/get-path-name", async (req, res) => {
-  try {
-    const result = await pathName.find();    
-    res.send(result);
-  } catch (err) {
-    res.status(500).send('Error fetching path names');
-  }
-});
-
-
-
-
-// ===========================================================================  Subscription 
 
 app.get('/subscribe', async (req, res) => {
   const plan = req.query.plan;
@@ -249,11 +212,6 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
 
 //   res.send();
 // });
-
-
-
-
-
 
 
 
