@@ -1,5 +1,7 @@
 
 export interface TPathName {
-    pathName : string
+    pathName : string,
+    status : string,
+    categoryStatus : string
   }
   

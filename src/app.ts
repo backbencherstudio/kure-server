@@ -23,7 +23,6 @@ app.use(
 );
 app.use("/api/v1", router)
 
-
 app.use('/uploads', express.static('uploads'));  
 
 app.get('/get-audios', async (req, res) => {
@@ -64,9 +63,9 @@ app.post('/upload-audio', upload.single('audio'), async (req, res) => {
 });
 
 app.post("/path-name", async (req, res) => {
-  const { pathName: path } = req.body;  
+  const { pathName: path, status, categoryStatus } = req.body;  
   if(path){
-    const result = await pathName.create({ pathName : path });
+    const result = await pathName.create({ pathName : path, status, categoryStatus });
     res.send(result);
     return
   } 
@@ -75,8 +74,13 @@ app.post("/path-name", async (req, res) => {
 
 app.get("/get-path-name", async (req, res) => {
   try {
-    const result = await pathName.find();    
-    res.send(result);
+    const result = await pathName.find();
+    const self = await pathName.find({status: 'self'});
+    const body = await pathName.find({status: 'body'});
+    const mind = await pathName.find({status: 'mind'});
+    const ego = await pathName.find({status: 'ego'});
+     
+    res.send({result, self, body, mind, ego});
   } catch (err) {
     res.status(500).send('Error fetching path names');
   }
