@@ -5,6 +5,11 @@ import { Auth } from '../../middleware/auth';
 const router = express.Router();
 
 router.get(
+  '/allUsers',
+  userController.getAllUser,
+);
+
+router.get(
   '/',
   Auth(),
   userController.getSingleUser,
@@ -43,6 +48,11 @@ router.post(
 router.post(
   '/refresh-token',
   userController.refreshToken,
+);
+
+router.post(
+  '/sendEmail',
+  userController.sendEmailToUser,
 );
 
 

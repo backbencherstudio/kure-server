@@ -7,7 +7,12 @@ import { TampUserCollection, User } from "./user.model";
 import { TLoginUser, TUser } from "./user.interface";
 import { sendEmail } from "../../utils/sendEmail";
 import { createToken, verifyToken } from "./user.utils";
+import { sendEmailToUser } from "../../utils/sendEmailToUser";
 
+const getAllUserFromDB = async () =>{
+  const result = await User.find()
+  return result
+}
 
 const getSingleUserFromDB = async (email : string) =>{  
   const result = await User.findOne({email})
@@ -281,7 +286,11 @@ const deleteExpiredUsers = async () => {
   }
 };
 
-
+const sendEmailToAllUser = async (payload : any) =>{
+  const { email, subject, value, filePath } = payload;
+  const result = await sendEmailToUser(email, subject, value, filePath)
+  return result;
+}
 
 
 setInterval(() => {
@@ -289,6 +298,7 @@ setInterval(() => {
 }, 24 * 60 * 60 * 1000);
 
   export const UserServices = {
+    getAllUserFromDB,
     getSingleUserFromDB,
     updateAudionInfoIntoDB,
     createUserIntoDB,
@@ -296,5 +306,6 @@ setInterval(() => {
     loginUserIntoDB,
     purchasePlan,
     refreshToken,
-    logOutUpdateIntoDB
+    logOutUpdateIntoDB,
+    sendEmailToAllUser
   };

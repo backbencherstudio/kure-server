@@ -4,12 +4,22 @@ import { catchAsync } from '../../utils/catchAsync';
 import { UserServices } from './user.service';
 import config from '../../config';
 
+const getAllUser = catchAsync(async (req, res) => {
+  const result = await UserServices.getAllUserFromDB();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'get all users',
+    data: result,
+  });
+});
+
 const getSingleUser = catchAsync(async (req, res) => {
   const result = await UserServices.getSingleUserFromDB(req?.query?.email as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'get All user',
+    message: 'get single user',
     data: result,
   });
 });
@@ -102,8 +112,21 @@ const logOutUpdate = catchAsync(async (req, res) => {
   });
 });
 
+const sendEmailToUser = catchAsync(async (req, res) => {
+  const result = await UserServices.sendEmailToAllUser(req.body);
+ 
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Email send  successfully',
+    data: result,
+  });
+});
+
+
 
 export const userController = {
+  getAllUser,
   getSingleUser,
   updateAudio,
   createUser,
@@ -111,5 +134,6 @@ export const userController = {
   verifyOTP,
   refreshToken,
   purchasePlanController,
-  logOutUpdate
+  logOutUpdate,
+  sendEmailToUser
 };
