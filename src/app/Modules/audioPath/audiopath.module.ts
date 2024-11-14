@@ -3,10 +3,13 @@ import { TPathName } from "./audioPath.interface";
 
 
 const pathNameSchema = new Schema<TPathName>({
-    pathName : {
+    audio : {
         type : String
     },
-    status : {
+    category : {
+        type : String
+    },
+    name : {
         type : String
     },
     categoryStatus : {

@@ -63,22 +63,22 @@ app.post('/upload-audio', upload.single('audio'), async (req, res) => {
 });
 
 app.post("/path-name", async (req, res) => {
-  const { pathName: path, status, categoryStatus } = req.body;  
+  const { audio, category, categoryStatus, name } = req.body;  
   if(path){
-    const result = await pathName.create({ pathName : path, status, categoryStatus });
+    const result = await pathName.create({ audio ,  category, categoryStatus , name});
     res.send(result);
     return
   } 
 });
 
 
-app.get("/get-path-name", async (req, res) => {
+app.get("/api/v1/get-path-name", async (req, res) => {
   try {
     const result = await pathName.find();
-    const self = await pathName.find({status: 'self'});
-    const body = await pathName.find({status: 'body'});
-    const mind = await pathName.find({status: 'mind'});
-    const ego = await pathName.find({status: 'ego'});
+    const self = await pathName.find({category: 'self'});
+    const body = await pathName.find({category: 'body'});
+    const mind = await pathName.find({category: 'mind'});
+    const ego = await pathName.find({category: 'ego'});
      
     res.send({result, self, body, mind, ego});
   } catch (err) {
