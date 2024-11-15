@@ -73,17 +73,26 @@ app.post("/path-name", async (req, res) => {
 
 
 app.get("/api/v1/get-path-name", async (req, res) => {
-  try {
+  const categoryStatus = req?.query?.showCategoryStatus  
+
+  
+
+  // try {
     const result = await pathName.find();
-    const self = await pathName.find({category: 'self'});
-    const body = await pathName.find({category: 'body'});
-    const mind = await pathName.find({category: 'mind'});
-    const ego = await pathName.find({category: 'ego'});
+
+    const self = await pathName.find({category: 'self', categoryStatus });
+    const body = await pathName.find({category: 'body', categoryStatus});
+    const mind = await pathName.find({category: 'mind', categoryStatus});
+    const ego = await pathName.find({category: 'ego', categoryStatus});
+
+    
+    // const withMusic = await pathName.find({ categoryStatus: 'withMusic'});
+    // const withOutMusic = await pathName.find({ categoryStatus: 'withOutMusic'});
      
     res.send({result, self, body, mind, ego});
-  } catch (err) {
-    res.status(500).send('Error fetching path names');
-  }
+  // } catch (err) {
+  //   res.status(500).send('Error fetching path names');
+  // }
 });
 
 
