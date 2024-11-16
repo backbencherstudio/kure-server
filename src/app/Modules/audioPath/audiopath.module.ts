@@ -3,6 +3,9 @@ import { TPathName } from "./audioPath.interface";
 
 
 const pathNameSchema = new Schema<TPathName>({
+    path : {
+        type : String
+    },
     audio : {
         type : String
     },

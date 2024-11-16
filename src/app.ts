@@ -6,13 +6,14 @@ import multer from 'multer';
 import path from 'path';
 import Stripe from 'stripe';
 import config from './app/config';
-import { pathName } from './app/Modules/audioPath/audiopath.module';  // MongoDB model for audio file URLs
+import { pathName } from './app/Modules/audioPath/audiopath.module';
 import router from './app/routes';
+import { User } from './app/Modules/User/user.model';
+import { AppError } from './app/errors/AppErrors';
 
 const app: Application = express();
 const stripe = new Stripe(config.stripe_test_secret_key as string);
 
-// Setup CORS and middlewares
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -73,9 +74,37 @@ app.post("/path-name", async (req, res) => {
 
 
 app.get("/api/v1/get-path-name", async (req, res) => {
-  const categoryStatus = req?.query?.showCategoryStatus  
+  const categoryStatus = req?.query?.showCategoryStatus   
+  const email = req?.query?.email   
+
+  const isExists = await User.findOne({email})
+  // if(!isExists){
+  //   throw new AppError(404, "User Not Found")
+  // }
 
   
+  const selectedPaths = await pathName.find({ 
+    _id: { $in: isExists?.selectedBodyAudios }
+  });
+  
+  const groupedSelectedPaths = selectedPaths?.reduce((groups, path) => {
+    const { category } = path;
+
+    if (!groups[category]) {
+      groups[category] = [];
+    }
+    groups[category].push(path);
+
+    return groups;
+
+  }, {});
+
+  
+  const selectedBodyitem = groupedSelectedPaths?.body;
+  const selectedMinditem = groupedSelectedPaths?.mind;
+  const selectedEgoitem = groupedSelectedPaths?.ego;
+  const selectedselfitem = groupedSelectedPaths?.self;
+
 
   // try {
     const result = await pathName.find();
@@ -85,14 +114,17 @@ app.get("/api/v1/get-path-name", async (req, res) => {
     const mind = await pathName.find({category: 'mind', categoryStatus});
     const ego = await pathName.find({category: 'ego', categoryStatus});
 
-    
-    // const withMusic = await pathName.find({ categoryStatus: 'withMusic'});
-    // const withOutMusic = await pathName.find({ categoryStatus: 'withOutMusic'});
      
-    res.send({result, self, body, mind, ego});
-  // } catch (err) {
-  //   res.status(500).send('Error fetching path names');
-  // }
+    res.send({
+      result,
+      self,
+      body,
+      mind,
+      ego, 
+      selectedBodyitem,
+      selectedMinditem,
+      selectedEgoitem,
+      selectedselfitem});
 });
 
 
@@ -139,7 +171,7 @@ app.get('/subscribe', async (req, res) => {
 
 
 app.get('/success', async (req, res) => {
-  const session = await stripe.checkout.sessions.retrieve(req.query.session_id, { 
+  const session = await stripe.checkout.sessions.retrieve(req?.query?.session_id, { 
     expand: ['subscription', 'subscription.plan.product'] 
   });
  
@@ -206,68 +238,6 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
 
   res.send();
 });
-
-
-// app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-//   const sig = req.headers['stripe-signature'];
-//   let event;
-
-//   try {
-//     event = stripe.webhooks.constructEvent(req.body, sig, config.stripe_webhook_secret_key);
-//   } catch (err) {
-//     console.error(`[${new Date().toISOString()}] <--  [400] POST ${req.originalUrl} - Webhook Error: ${err.message}`);
-//     return res.status(400).send(`Webhook Error: ${err.message}`);
-//   }
-
-//   // Log the event in a structured format
-//   const logEvent = (direction, event) => {
-//     const timestamp = new Date().toISOString();
-//     const eventType = event.type;
-//     const eventId = event.id;
-//     console.log(`${timestamp}  ${direction} ${eventType} [${eventId}]`);
-//   };
-
-//   // Log incoming event
-//   logEvent('-->', event);
-
-//   // Handle the event
-//   switch (event.type) {
-//     case 'checkout.session.completed':
-//       console.log(`[${new Date().toISOString()}] Subscription started!`);
-//       console.log('Details:', event.data.object);
-//       break;
-
-//     case 'invoice.paid':
-//       console.log(`[${new Date().toISOString()}] Invoice paid`);
-//       console.log('Details:', event.data.object);
-//       break;
-
-//     case 'invoice.payment_failed':
-//       console.log(`[${new Date().toISOString()}] Invoice payment failed!`);
-//       console.log('Details:', event.data.object);
-//       break;
-
-//     case 'customer.subscription.updated':
-//       console.log(`[${new Date().toISOString()}] Subscription updated!`);
-//       console.log('Details:', event.data.object);
-//       break;
-
-//     default:
-//       console.log(`[${new Date().toISOString()}] Unhandled event type ${event.type}`);
-//       break;
-//   }
-
-//   // Log outgoing response
-//   logEvent('<--', event);
-
-//   res.send();
-// });
-
-
-
-
-
-
 
 
 export default app;

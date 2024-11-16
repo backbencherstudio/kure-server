@@ -20,6 +20,7 @@ const getSingleUserFromDB = async (email : string) =>{
 }
 
 const updateAudionInfoIntoDB = async (payload: Partial<TUser>) => {
+
   const userData = await User.findOne({ email: payload?.email });
   if (!userData) {
     throw new AppError(404, "user not found");
@@ -70,6 +71,7 @@ const updateAudionInfoIntoDB = async (payload: Partial<TUser>) => {
     { new: true, runValidators: true }
   );
   return result;
+
 };
 
 const logOutUpdateIntoDB = async ( email : string )=>{
@@ -128,13 +130,22 @@ const createUserIntoDB = async (payload: TUser) => {
   };
 };
 
-const purchasePlan = async (payload: Partial<TUser>) => {  
-  const userData = await User.findOne({email : payload?.email});
-  // const day = parseInt(payload.plan|| "0", 10);  
+const setSelectedAudioIntoDB = async(payload : any )=>{
+  const isExists = await User.findOne({email : payload?.email})
+  if(!isExists){
+    throw new AppError(404, "user not found");
+  }
 
-  // const currentDate = new Date();
-  // const expiresDate = new Date(currentDate.setDate(currentDate.getDate() + day));
+  const updateData = {
+    selectedBodyAudios : payload.idArray
+  }  
+  const result = await User.findOneAndUpdate({email : payload.email}, updateData, {new : true, runValidators : true} )
+  return result
   
+}
+
+const purchasePlan = async (payload: Partial<TUser>) => {  
+  const userData = await User.findOne({email : payload?.email});  
   
   if(userData?.sessionId !== payload.sessionId ){
     const  updateData = {
@@ -304,6 +315,7 @@ setInterval(() => {
     createUserIntoDB,
     verifyOTPintoDB,
     loginUserIntoDB,
+    setSelectedAudioIntoDB,
     purchasePlan,
     refreshToken,
     logOutUpdateIntoDB,

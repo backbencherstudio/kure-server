@@ -154,7 +154,7 @@ const userSchema = new Schema<TUser>(
       default: false,
     },
     selectedBodyAudios : {
-      type : [Number],
+      type : [String],
       default : []
     },
     selectedMindAudios : {

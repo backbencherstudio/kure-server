@@ -18,6 +18,8 @@ export const Auth = () => {
         config.jwt_access_secret as string,
       ) as JwtPayload;
     } catch (err) {
+      console.log(err);
+      
       throw new AppError(httpStatus.UNAUTHORIZED, 'Unauthorized!');
     }
     const { email } = decoded;

@@ -55,5 +55,10 @@ router.post(
   userController.sendEmailToUser,
 );
 
+router.patch(
+  '/selectedAudio',
+  userController.setSelectedAudio,
+);
+
 
 export const UserRouter = router;

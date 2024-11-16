@@ -47,6 +47,17 @@ const createUser = catchAsync(async (req, res) => {
 });
 
 
+const setSelectedAudio = catchAsync(async (req, res) => {
+  const { data } = req.body;  
+  const result = await UserServices.setSelectedAudioIntoDB(data);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Audio Selected successFully',
+    data: result,
+  });
+});
+
 const purchasePlanController = catchAsync(async (req, res) => {
   const { purchasePlan: updateData } = req.body;
   const result = await UserServices.purchasePlan(updateData);
@@ -133,6 +144,7 @@ export const userController = {
   loginUser,
   verifyOTP,
   refreshToken,
+  setSelectedAudio,
   purchasePlanController,
   logOutUpdate,
   sendEmailToUser
