@@ -6,7 +6,7 @@ import { Model } from 'mongoose';
 export interface TUser {
   id: string;
   Id : number; 
-  selfId ?: string;
+  selfId ?: number;
   egoId ?: string;
   mindId ?: string;
   bodyId ?: string;

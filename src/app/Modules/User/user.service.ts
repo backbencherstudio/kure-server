@@ -9,9 +9,28 @@ import { sendEmail } from "../../utils/sendEmail";
 import { createToken, verifyToken } from "./user.utils";
 import { sendEmailToUser } from "../../utils/sendEmailToUser";
 
-const getAllUserFromDB = async () =>{
-  const result = await User.find()
+const getAllUserFromDB = async (payload : string ) =>{ 
+
+  if(payload === "all"){
+    const result = await User.find()
+    return result
+  }
+
+  if(payload === "inactive"){
+    const date = new Date()
+    const result2 = await User.find()
+    const filterData = result2.filter(item => {
+      const createdAtDate = new Date(item.createdAt);
+      const timeDifferenceInDays = Math.floor((date - createdAtDate) / (1000 * 60 * 60 * 24)); 
+      return parseInt(timeDifferenceInDays) > item.selfId; 
+    });  
+    return filterData
+  }
+
+  const isSubscribeUser = payload === "nonSubscriber"
+  const result = await User.find({isDeleted : isSubscribeUser })
   return result
+
 }
 
 const getSingleUserFromDB = async (email : string) =>{  
@@ -19,60 +38,29 @@ const getSingleUserFromDB = async (email : string) =>{
   return result
 }
 
-const updateAudionInfoIntoDB = async (payload: Partial<TUser>) => {
 
-  const userData = await User.findOne({ email: payload?.email });
-  if (!userData) {
-    throw new AppError(404, "user not found");
-  }
+const updateAudionInfoIntoDB = async (payload: Partial<TUser>): Promise<TUser | null> => {  
+  try {
+    const userData = await User.findOne({ email: payload?.email });
+    if (!userData) {
+      throw new AppError(404, "User not found");
+    }
 
-  let dynamicKey: keyof TUser | undefined;
-  if (payload.category === 'body') {
-    dynamicKey = 'bodyId';
-  } else if (payload.category === 'mind') {
-    dynamicKey = 'mindId';
-  } else if (payload.category === 'self') {
-    dynamicKey = 'selfId';
-  } else if (payload.category === 'ego') {
-    dynamicKey = 'egoId';
-  }
-
-  if (dynamicKey && payload[dynamicKey] !== undefined) {
-    const previousIdValue = userData[dynamicKey] || "0";
-    payload[dynamicKey] = (parseInt(previousIdValue, 10) + 1).toString() as any; 
-  }
-
-  if ((payload.selectedMindAudios && payload.selectedBodyAudios) || 
-      (payload.selectedEgoAudios && payload.selectedSelfAudios)) {
     const result = await User.findOneAndUpdate(
       { email: payload.email },
-      payload,
+      { selfId: (userData?.selfId || 0) + 1 },
       { new: true, runValidators: true }
     );
+
     return result;
+  } catch (error) {
+    console.error("Error updating audio info:", error);
+    throw new AppError(500, "Failed to update audio information");
   }
-
-  if (userData?.selfId === "end") {
-    delete payload.selfId;
-  }
-  if (payload.selfId === "end") {
-    payload.egoId = "1";
-  }
-  if (userData?.bodyId === "end") {
-    delete payload.bodyId;
-  }
-  if (payload.bodyId === "end") {
-    payload.mindId = "1";
-  }
-
-  const result = await User.findOneAndUpdate(
-    { email: payload.email },
-    payload,
-    { new: true, runValidators: true }
-  );
-  return result;
-
 };
+
+
+
 
 const logOutUpdateIntoDB = async ( email : string )=>{
   const payload = {
@@ -155,6 +143,7 @@ const purchasePlan = async (payload: Partial<TUser>) => {
         selectedEgoAudios : [],
         selectedSelfAudios : [],
         sessionId : payload.sessionId || "",
+        isDeleted : false
       },
     };
     const result = await User.findOneAndUpdate(
@@ -178,6 +167,15 @@ const purchasePlan = async (payload: Partial<TUser>) => {
     return result;    
   }
 };
+
+const userDeleteIntoDB = async ( payload : any ) =>{  
+    const isUserExists = await User.findOne({email : payload});
+    if(!isUserExists){
+      throw new AppError(httpStatus.BAD_REQUEST, "User not Found")
+    }
+    const result = await User.findOneAndUpdate({email : payload}, { isDeleted : true }, {new : true, runValidators : true})
+    return result    
+}
 
 const verifyOTPintoDB = async (email: string, otp: string, userType: any) => {
   const tempUser = await TampUserCollection.findOne({ email });
@@ -313,6 +311,7 @@ setInterval(() => {
     getSingleUserFromDB,
     updateAudionInfoIntoDB,
     createUserIntoDB,
+    userDeleteIntoDB,
     verifyOTPintoDB,
     loginUserIntoDB,
     setSelectedAudioIntoDB,

@@ -101,8 +101,8 @@ const userSchema = new Schema<TUser>(
       required: [true, "Id is required"],
     },
     selfId: {
-      type: String,
-      default : "0"
+      type: Number,
+      default : 0
     },
     egoId: {
       type: String,

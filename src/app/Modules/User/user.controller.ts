@@ -5,7 +5,8 @@ import { UserServices } from './user.service';
 import config from '../../config';
 
 const getAllUser = catchAsync(async (req, res) => {
-  const result = await UserServices.getAllUserFromDB();
+  const status = req.query.status
+  const result = await UserServices.getAllUserFromDB(status as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -45,7 +46,6 @@ const createUser = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
 
 const setSelectedAudio = catchAsync(async (req, res) => {
   const { data } = req.body;  
@@ -100,6 +100,17 @@ const refreshToken = catchAsync(async (req, res) => {
 });
 
 
+const userDelete = catchAsync(async (req, res) => {
+  const { email } = req.body;
+  const result = await UserServices.userDeleteIntoDB(email);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User Delete successFully',
+    data: result,
+  });
+});
+
 const verifyOTP = catchAsync(async (req, res) => {
   const { email, otp, userType } = req.body;
   const result = await UserServices.verifyOTPintoDB(email, otp, userType);
@@ -142,6 +153,7 @@ export const userController = {
   updateAudio,
   createUser,
   loginUser,
+  userDelete,
   verifyOTP,
   refreshToken,
   setSelectedAudio,

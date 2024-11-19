@@ -40,6 +40,11 @@ router.post(
   userController.loginUser,
 );
 
+router.patch(
+  '/userDelete',
+  userController.userDelete,
+);
+
 router.post(
   '/verifyOTP',
   userController.verifyOTP,
