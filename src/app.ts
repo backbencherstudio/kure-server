@@ -165,43 +165,32 @@ app.get('/subscribe', async (req, res) => {
 });
 
 
-
 app.get('/success', async (req, res) => {
   try {
     const sessionId = req?.query.session_id;
-
     if (!sessionId || typeof sessionId !== 'string') {
       return res.status(400).send('Invalid or missing session_id');
     }
-
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['subscription', 'subscription.plan.product'],
     });
-
     const subscription = session.subscription as Stripe.Subscription;
-
     const subscriptionDetails = await stripe.subscriptions.retrieve(subscription.id, {
       expand: ['items.data.price'],
     });
-
     const planAmount = subscriptionDetails.items.data[0]?.price?.unit_amount || 0;
-
     const sessionData = {
       customer_id: subscription.customer || null,
       subscription_email: session.customer_details?.email || null,
       plan: planAmount / 100, 
       status: subscriptionDetails.status || null,
     };
-
     res.status(200).json(sessionData);
   } catch (error: any) {
     console.error('Error retrieving session:', error.message);
     res.status(500).json({ error: 'Failed to retrieve session details' });
   }
 });
-
-
-
 
 app.get('/cancel', (req, res) => {
   res.redirect('/');
