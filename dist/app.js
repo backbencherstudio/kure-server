@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-undef */
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
@@ -79,13 +80,10 @@ app.get("/api/v1/get-path-name", (req, res) => __awaiter(void 0, void 0, void 0,
     const categoryStatus = (_a = req === null || req === void 0 ? void 0 : req.query) === null || _a === void 0 ? void 0 : _a.showCategoryStatus;
     const email = (_b = req === null || req === void 0 ? void 0 : req.query) === null || _b === void 0 ? void 0 : _b.email;
     const isExists = yield user_model_1.User.findOne({ email });
-    // if(!isExists){
-    //   throw new AppError(404, "User Not Found")
-    // }
     const selectedPaths = yield audiopath_module_1.pathName.find({
         _id: { $in: isExists === null || isExists === void 0 ? void 0 : isExists.selectedBodyAudios }
     });
-    const groupedSelectedPaths = selectedPaths === null || selectedPaths === void 0 ? void 0 : selectedPaths.reduce((groups, path) => {
+    const groupedSelectedPaths = selectedPaths.reduce((groups, path) => {
         const { category } = path;
         if (!groups[category]) {
             groups[category] = [];
@@ -97,12 +95,12 @@ app.get("/api/v1/get-path-name", (req, res) => __awaiter(void 0, void 0, void 0,
     const selectedMinditem = groupedSelectedPaths === null || groupedSelectedPaths === void 0 ? void 0 : groupedSelectedPaths.mind;
     const selectedEgoitem = groupedSelectedPaths === null || groupedSelectedPaths === void 0 ? void 0 : groupedSelectedPaths.ego;
     const selectedselfitem = groupedSelectedPaths === null || groupedSelectedPaths === void 0 ? void 0 : groupedSelectedPaths.self;
-    // try {
     const result = yield audiopath_module_1.pathName.find();
     const self = yield audiopath_module_1.pathName.find({ category: 'self', categoryStatus });
     const body = yield audiopath_module_1.pathName.find({ category: 'body', categoryStatus });
     const mind = yield audiopath_module_1.pathName.find({ category: 'mind', categoryStatus });
     const ego = yield audiopath_module_1.pathName.find({ category: 'ego', categoryStatus });
+    const vault = yield audiopath_module_1.pathName.find({ category: 'vault' });
     res.send({
         result,
         self,
@@ -112,17 +110,18 @@ app.get("/api/v1/get-path-name", (req, res) => __awaiter(void 0, void 0, void 0,
         selectedBodyitem,
         selectedMinditem,
         selectedEgoitem,
-        selectedselfitem
+        selectedselfitem,
+        vault
     });
 }));
 // ===========================================================================  Subscription 
 app.get('/subscribe', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const plan = req.query.plan;
-    if (!plan) {
+    if (!plan || typeof plan !== 'string') {
         return res.send('Subscription plan not found');
     }
     let priceId;
-    switch (plan.toLowerCase()) {
+    switch (plan === null || plan === void 0 ? void 0 : plan.toLowerCase()) {
         case 'test':
             priceId = 'price_1QJqiPCeMjBQYGyCqZZKVILH';
             break;
@@ -149,16 +148,31 @@ app.get('/subscribe', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 }));
 app.get('/success', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _c, _d, _e;
-    const session = yield stripe.checkout.sessions.retrieve((_c = req === null || req === void 0 ? void 0 : req.query) === null || _c === void 0 ? void 0 : _c.session_id, {
-        expand: ['subscription', 'subscription.plan.product']
-    });
-    const sessionData = {
-        customer_id: (_d = session === null || session === void 0 ? void 0 : session.subscription) === null || _d === void 0 ? void 0 : _d.customer,
-        subscription_email: (_e = session === null || session === void 0 ? void 0 : session.customer_details) === null || _e === void 0 ? void 0 : _e.email,
-        plan: ((session === null || session === void 0 ? void 0 : session.subscription.plan.amount) / 100),
-        status: session === null || session === void 0 ? void 0 : session.subscription.status
-    };
-    res.send(sessionData);
+    try {
+        const sessionId = req === null || req === void 0 ? void 0 : req.query.session_id;
+        if (!sessionId || typeof sessionId !== 'string') {
+            return res.status(400).send('Invalid or missing session_id');
+        }
+        const session = yield stripe.checkout.sessions.retrieve(sessionId, {
+            expand: ['subscription', 'subscription.plan.product'],
+        });
+        const subscription = session.subscription;
+        const subscriptionDetails = yield stripe.subscriptions.retrieve(subscription.id, {
+            expand: ['items.data.price'],
+        });
+        const planAmount = ((_d = (_c = subscriptionDetails.items.data[0]) === null || _c === void 0 ? void 0 : _c.price) === null || _d === void 0 ? void 0 : _d.unit_amount) || 0;
+        const sessionData = {
+            customer_id: subscription.customer || null,
+            subscription_email: ((_e = session.customer_details) === null || _e === void 0 ? void 0 : _e.email) || null,
+            plan: planAmount / 100,
+            status: subscriptionDetails.status || null,
+        };
+        res.status(200).json(sessionData);
+    }
+    catch (error) {
+        console.error('Error retrieving session:', error.message);
+        res.status(500).json({ error: 'Failed to retrieve session details' });
+    }
 }));
 app.get('/cancel', (req, res) => {
     res.redirect('/');
@@ -170,38 +184,37 @@ app.get("/customers/:customerId", (req, res) => __awaiter(void 0, void 0, void 0
     });
     res.redirect(portalSession.url);
 }));
-app.post('/webhook', express_1.default.raw({ type: 'application/json' }), (req, res) => {
-    const sig = req.headers['stripe-signature'];
-    let event;
-    try {
-        event = stripe.webhooks.constructEvent(req.body, sig, config_1.default.stripe_webhook_secret_key);
-    }
-    catch (err) {
-        return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-    switch (event.type) {
-        case 'checkout.session.completed':
-            console.log('New Subscription started!');
-            console.log(116, event.data);
-            break;
-        // Event when the payment is successfull (every subscription interval)  
-        case 'invoice.paid':
-            console.log('Invoice paid');
-            console.log(122, event.data);
-            break;
-        // Event when the payment failed due to card problems or insufficient funds (every subscription interval)  
-        case 'invoice.payment_failed':
-            console.log('Invoice payment failed!');
-            console.log(128, event.data);
-            break;
-        // Event when subscription is updated  
-        case 'customer.subscription.updated':
-            console.log('Subscription updated!');
-            console.log(134, event.data);
-            break;
-        default:
-            console.log(`Unhandled event type ${event.type}`);
-    }
-    res.send();
-});
+// app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
+//   const sig = req.headers['stripe-signature'];  
+//   let event;
+//   try {
+//       event = stripe.webhooks.constructEvent(req.body, sig, config.stripe_webhook_secret_key);
+//   } catch (err : any) {
+//       return res.status(400).send(`Webhook Error: ${err.message}`);
+//   }
+//   switch (event.type) {
+//     case 'checkout.session.completed':
+//       console.log('New Subscription started!')
+//       console.log(116, event.data)
+//       break;
+//     // Event when the payment is successfull (every subscription interval)  
+//     case 'invoice.paid':
+//       console.log('Invoice paid')
+//       console.log(122, event.data)
+//       break;
+//     // Event when the payment failed due to card problems or insufficient funds (every subscription interval)  
+//     case 'invoice.payment_failed':  
+//       console.log('Invoice payment failed!')
+//       console.log(128, event.data)
+//       break;
+//     // Event when subscription is updated  
+//     case 'customer.subscription.updated':
+//       console.log('Subscription updated!')
+//       console.log(134, event.data)
+//       break
+//     default:
+//       console.log(`Unhandled event type ${event.type}`);
+//   }
+//   res.send();
+// });
 exports.default = app;
