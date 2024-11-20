@@ -107,7 +107,7 @@ app.get("/api/v1/get-path-name", async (req, res) => {
     const body = await pathName.find({category: 'body', categoryStatus});
     const mind = await pathName.find({category: 'mind', categoryStatus});
     const ego = await pathName.find({category: 'ego', categoryStatus});
-
+    const vault = await pathName.find({category: 'vault'});    
      
     res.send({
       result,
@@ -118,7 +118,10 @@ app.get("/api/v1/get-path-name", async (req, res) => {
       selectedBodyitem,
       selectedMinditem,
       selectedEgoitem,
-      selectedselfitem});
+      selectedselfitem,
+      vault
+    });
+
 });
 
 // ===========================================================================  Subscription 

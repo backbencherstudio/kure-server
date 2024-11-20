@@ -33,7 +33,6 @@ import { sendEmailToUser } from "../../utils/sendEmailToUser";
 
 // }
 
-
 const getAllUserFromDB = async (payload: string): Promise<any[]> => { 
   if (payload === "all") {
     const result = await User.find();
@@ -41,7 +40,7 @@ const getAllUserFromDB = async (payload: string): Promise<any[]> => {
   }
   if (payload === "inactive") {
     const date = new Date(); 
-    const result2 = await User.find();
+    const result2 = await User.find({isDeleted : false});
     const filterData = result2.filter(item => {
       const createdAtDate = new Date(item.createdAt as Date); 
       const timeDifferenceInDays = Math.floor((date.getTime() - createdAtDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -56,12 +55,10 @@ const getAllUserFromDB = async (payload: string): Promise<any[]> => {
   return result;
 };
 
-
 const getSingleUserFromDB = async (email : string) =>{  
   const result = await User.findOne({email})
   return result
 }
-
 
 const updateAudionInfoIntoDB = async (payload: Partial<TUser>): Promise<TUser | null> => {  
   try {
@@ -69,7 +66,6 @@ const updateAudionInfoIntoDB = async (payload: Partial<TUser>): Promise<TUser | 
     if (!userData) {
       throw new AppError(404, "User not found");
     }
-
     const result = await User.findOneAndUpdate(
       { email: payload.email },
       { selfId: (userData?.selfId || 0) + 1 },
@@ -82,9 +78,6 @@ const updateAudionInfoIntoDB = async (payload: Partial<TUser>): Promise<TUser | 
     throw new AppError(500, "Failed to update audio information");
   }
 };
-
-
-
 
 const logOutUpdateIntoDB = async ( email : string )=>{
   const payload = {

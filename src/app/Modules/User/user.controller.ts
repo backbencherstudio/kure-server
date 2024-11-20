@@ -69,7 +69,6 @@ const purchasePlanController = catchAsync(async (req, res) => {
   });
 });
 
-
 const loginUser = catchAsync(async (req, res) => {
   const result = await UserServices.loginUserIntoDB(req.body);
   const { refreshToken, accessToken } = result;
@@ -87,7 +86,6 @@ const loginUser = catchAsync(async (req, res) => {
   });
 });
 
-
 const refreshToken = catchAsync(async (req, res) => {
   const { refreshToken } = req.cookies;
   const result = await UserServices.refreshToken(refreshToken);
@@ -98,7 +96,6 @@ const refreshToken = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
 
 const userDelete = catchAsync(async (req, res) => {
   const { email } = req.body;
@@ -122,7 +119,6 @@ const verifyOTP = catchAsync(async (req, res) => {
   });
 });
 
-
 const logOutUpdate = catchAsync(async (req, res) => {
   const { email } = req.body;
   const result = await UserServices.logOutUpdateIntoDB(email);
@@ -144,7 +140,6 @@ const sendEmailToUser = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
 
 
 export const userController = {
