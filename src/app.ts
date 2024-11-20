@@ -130,12 +130,13 @@ app.get('/subscribe', async (req, res) => {
   const plan = req.query.plan;
   
 
-  if (!plan) {
+  if (!plan || typeof plan !== 'string') {
     return res.send('Subscription plan not found');
   }
 
   let priceId;
-  switch (plan.toLowerCase()) {
+  
+  switch (plan?.toLowerCase()) {
     case 'test':
       priceId = 'price_1QJqiPCeMjBQYGyCqZZKVILH'; 
       break;
@@ -160,24 +161,45 @@ app.get('/subscribe', async (req, res) => {
     cancel_url: `${config.client_base_url}/subscriptionplan`,
   });
     
-  res.redirect(session.url);
+  res.redirect(session.url as string);
 });
+
 
 
 app.get('/success', async (req, res) => {
-  const session = await stripe.checkout.sessions.retrieve(req?.query?.session_id, { 
-    expand: ['subscription', 'subscription.plan.product'] 
-  });
- 
-  const sessionData = {
-    customer_id : session?.subscription?.customer ,
-    subscription_email : session?.customer_details?.email,
-    plan : (session?.subscription.plan.amount / 100),
-    status : session?.subscription.status
-  } 
+  try {
+    const sessionId = req?.query.session_id;
 
-  res.send(sessionData);
+    if (!sessionId || typeof sessionId !== 'string') {
+      return res.status(400).send('Invalid or missing session_id');
+    }
+
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['subscription', 'subscription.plan.product'],
+    });
+
+    const subscription = session.subscription as Stripe.Subscription;
+
+    const subscriptionDetails = await stripe.subscriptions.retrieve(subscription.id, {
+      expand: ['items.data.price'],
+    });
+
+    const planAmount = subscriptionDetails.items.data[0]?.price?.unit_amount || 0;
+
+    const sessionData = {
+      customer_id: subscription.customer || null,
+      subscription_email: session.customer_details?.email || null,
+      plan: planAmount / 100, 
+      status: subscriptionDetails.status || null,
+    };
+
+    res.status(200).json(sessionData);
+  } catch (error: any) {
+    console.error('Error retrieving session:', error.message);
+    res.status(500).json({ error: 'Failed to retrieve session details' });
+  }
 });
+
 
 
 
@@ -193,45 +215,46 @@ app.get("/customers/:customerId", async(req, res)=>{
   res.redirect(portalSession.url)
 } )
 
-app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
-  const sig = req.headers['stripe-signature'];  
-  let event;
-  try {
-      event = stripe.webhooks.constructEvent(req.body, sig, config.stripe_webhook_secret_key);
-  } catch (err : any) {
-      return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
 
-  switch (event.type) {
-    case 'checkout.session.completed':
-      console.log('New Subscription started!')
-      console.log(116, event.data)
-      break;
+// app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
+//   const sig = req.headers['stripe-signature'];  
+//   let event;
+//   try {
+//       event = stripe.webhooks.constructEvent(req.body, sig, config.stripe_webhook_secret_key);
+//   } catch (err : any) {
+//       return res.status(400).send(`Webhook Error: ${err.message}`);
+//   }
 
-    // Event when the payment is successfull (every subscription interval)  
-    case 'invoice.paid':
-      console.log('Invoice paid')
-      console.log(122, event.data)
-      break;
+//   switch (event.type) {
+//     case 'checkout.session.completed':
+//       console.log('New Subscription started!')
+//       console.log(116, event.data)
+//       break;
 
-    // Event when the payment failed due to card problems or insufficient funds (every subscription interval)  
-    case 'invoice.payment_failed':  
-      console.log('Invoice payment failed!')
-      console.log(128, event.data)
-      break;
+//     // Event when the payment is successfull (every subscription interval)  
+//     case 'invoice.paid':
+//       console.log('Invoice paid')
+//       console.log(122, event.data)
+//       break;
 
-    // Event when subscription is updated  
-    case 'customer.subscription.updated':
-      console.log('Subscription updated!')
-      console.log(134, event.data)
-      break
+//     // Event when the payment failed due to card problems or insufficient funds (every subscription interval)  
+//     case 'invoice.payment_failed':  
+//       console.log('Invoice payment failed!')
+//       console.log(128, event.data)
+//       break;
 
-    default:
-      console.log(`Unhandled event type ${event.type}`);
-  }
+//     // Event when subscription is updated  
+//     case 'customer.subscription.updated':
+//       console.log('Subscription updated!')
+//       console.log(134, event.data)
+//       break
 
-  res.send();
-});
+//     default:
+//       console.log(`Unhandled event type ${event.type}`);
+//   }
+
+//   res.send();
+// });
 
 
 export default app;
