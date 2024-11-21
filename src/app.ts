@@ -53,7 +53,6 @@ app.post('/upload-audio', upload.single('audio'), async (req, res) => {
   if (!req.file) {
     return res.status(400).send('No file uploaded');
   }
-
   try {
     const newAudioUrl = `/uploads/${req.file.filename}`;
     res.status(200).send({ filePath: newAudioUrl });
