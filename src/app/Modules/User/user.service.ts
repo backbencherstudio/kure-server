@@ -101,10 +101,10 @@ const createUserIntoDB = async (payload: TUser) => {
   const isStudentExists = await TampUserCollection.findOne({ email: payload?.email });
   const isStudentExistsInUser = await User.findOne({ email: payload?.email });
 
-  const hashedPassword = await bcrypt.hash(payload?.password, 8); 
+  const hashedPassword = await bcrypt.hash(payload?.password, 8);   
 
   if (isStudentExistsInUser ) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'User already exists');
+    throw new AppError(400, 'User already exists');
   }
 
   if(isStudentExists){   

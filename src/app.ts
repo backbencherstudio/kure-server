@@ -64,7 +64,7 @@ app.post('/upload-audio', upload.single('audio'), async (req, res) => {
 });
 
 app.post("/path-name", async (req, res) => {
-  const { audio, category, categoryStatus, name } = req.body;  
+  const { audio, category, categoryStatus, name } = req.body;
   if(path){
     const result = await pathName.create({ audio ,  category, categoryStatus , name});
     res.send(result);
@@ -72,14 +72,20 @@ app.post("/path-name", async (req, res) => {
   } 
 });
 
+app.patch("/api/v1/path-name", async (req, res) => {
+  const {getId : id,  audio, category, categoryStatus, name } = req.body;  
+  if(path){
+      const result = await pathName.findByIdAndUpdate( id , { audio ,  category, categoryStatus , name}, {new : true, runValidators : true} );
+      res.send(result);
+    return    
+  } 
+});
+
 
 app.get("/api/v1/get-path-name", async (req, res) => {
   const categoryStatus = req?.query?.showCategoryStatus   
-  const email = req?.query?.email   
-
-
-  const isExists = await User.findOne({email})
-  
+  const email = req?.query?.email
+  const isExists = await User.findOne({email})  
   const selectedPaths = await pathName.find({ 
     _id: { $in: isExists?.selectedBodyAudios }
   });
