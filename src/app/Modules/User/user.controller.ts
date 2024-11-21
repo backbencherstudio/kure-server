@@ -47,6 +47,18 @@ const createUser = catchAsync(async (req, res) => {
   });
 });
 
+const resetPassword = catchAsync(async (req, res) => {
+  const { user: userData } = req.body;
+  const result = await UserServices.resetPasswordIntoDB(userData);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Password Reset successFully',
+    data: result,
+  });
+});
+
+
 const setSelectedAudio = catchAsync(async (req, res) => {
   const { data } = req.body;  
   const result = await UserServices.setSelectedAudioIntoDB(data);
@@ -151,6 +163,7 @@ export const userController = {
   userDelete,
   verifyOTP,
   refreshToken,
+  resetPassword,
   setSelectedAudio,
   purchasePlanController,
   logOutUpdate,

@@ -135,6 +135,16 @@ const createUserIntoDB = async (payload: TUser) => {
   };
 };
 
+const resetPasswordIntoDB = async (payload : any )=>{
+  const isUserExistsInUser = await User.findOne({ email: payload?.email });
+  if(!isUserExistsInUser){
+    throw new AppError(httpStatus.NOT_FOUND, "User Not Found")
+  }
+  const hashedPassword = await bcrypt.hash(payload?.password, 8);
+  const result = await User.findOneAndUpdate({email : payload.email}, {password : hashedPassword}, {new : true, runValidators : true})
+  return result  
+}
+
 const setSelectedAudioIntoDB = async(payload : any )=>{
   const isExists = await User.findOne({email : payload?.email})
   if(!isExists){
@@ -331,6 +341,7 @@ setInterval(() => {
     userDeleteIntoDB,
     verifyOTPintoDB,
     loginUserIntoDB,
+    resetPasswordIntoDB,
     setSelectedAudioIntoDB,
     purchasePlan,
     refreshToken,

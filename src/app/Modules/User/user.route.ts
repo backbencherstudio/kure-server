@@ -26,6 +26,11 @@ router.post(
 );
 
 router.patch(
+  '/resetPassword',
+  userController.resetPassword,
+);
+
+router.patch(
   '/log-out-update',
   userController.logOutUpdate,
 );
