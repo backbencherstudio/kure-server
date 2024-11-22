@@ -75,6 +75,14 @@ app.post("/path-name", (req, res) => __awaiter(void 0, void 0, void 0, function*
         return;
     }
 }));
+app.patch("/api/v1/path-name", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { getId: id, audio, category, categoryStatus, name } = req.body;
+    if (path_1.default) {
+        const result = yield audiopath_module_1.pathName.findByIdAndUpdate(id, { audio, category, categoryStatus, name }, { new: true, runValidators: true });
+        res.send(result);
+        return;
+    }
+}));
 app.get("/api/v1/get-path-name", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const categoryStatus = (_a = req === null || req === void 0 ? void 0 : req.query) === null || _a === void 0 ? void 0 : _a.showCategoryStatus;
