@@ -19,10 +19,16 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ['http://localhost:5173'],  
+    origin: ['http://localhost:5173', "https://hypno4u.com"],  
     credentials: true,
   })
 );
+
+app.get('/test', async (req, res) => {
+  const a = 'server running successfully';
+  res.send(a);
+});
+
 app.use("/api/v1", router)
 
 app.use('/uploads', express.static('uploads'));  
