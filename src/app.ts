@@ -10,6 +10,7 @@ import config from './app/config';
 import { pathName } from './app/Modules/audioPath/audiopath.module';
 import router from './app/routes';
 import { User } from './app/Modules/User/user.model';
+import globalErrorHandler from './app/middleware/globalErrorHandlear';
 
 const app: Application = express();
 const stripe = new Stripe(config.stripe_test_secret_key as string);
@@ -85,6 +86,7 @@ app.get("/api/v1/get-path-name", async (req, res) => {
   const categoryStatus = req?.query?.showCategoryStatus   
   const email = req?.query?.email
   const isExists = await User.findOne({email})  
+
   const selectedPaths = await pathName.find({ 
     _id: { $in: isExists?.selectedBodyAudios }
   });
@@ -113,6 +115,7 @@ app.get("/api/v1/get-path-name", async (req, res) => {
     const mind = await pathName.find({category: 'mind', categoryStatus});
     const ego = await pathName.find({category: 'ego', categoryStatus});
     const vault = await pathName.find({category: 'vault'});    
+    const intro = await pathName.find({category: 'intro'});    
      
     res.send({
       result,
@@ -124,7 +127,8 @@ app.get("/api/v1/get-path-name", async (req, res) => {
       selectedMinditem,
       selectedEgoitem,
       selectedselfitem,
-      vault
+      vault,
+      intro
     });
 
 });
@@ -249,6 +253,8 @@ app.get("/customers/:customerId", async(req, res)=>{
 
 //   res.send();
 // });
+
+app.use(globalErrorHandler);
 
 
 export default app;

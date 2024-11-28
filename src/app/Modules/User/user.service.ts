@@ -44,7 +44,6 @@ const getAllUserFromDB = async (payload: string): Promise<any[]> => {
     const filterData = result2.filter(item => {
       const createdAtDate = new Date(item.createdAt as Date); 
       const timeDifferenceInDays = Math.floor((date.getTime() - createdAtDate.getTime()) / (1000 * 60 * 60 * 24));
-
       return typeof item.selfId === 'number' && timeDifferenceInDays > item.selfId;
     });
 
