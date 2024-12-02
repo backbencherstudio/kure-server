@@ -28,7 +28,7 @@ app.get('/test', async (req, res) => {
   const a = 'server running successfully';
   res.send(a);
 });
-
+  
 app.use("/api/v1", router)
 
 app.use('/uploads', express.static('uploads'));  
@@ -172,7 +172,7 @@ app.get('/subscribe', async (req, res) => {
     mode: 'subscription',
     line_items: [{ price: priceId, quantity: 1 }],
     // success_url: `${config.client_base_url}/login`,
-    success_url: `${config.client_base_url}/daily-audios?session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${config.client_base_url}daily-audios?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${config.client_base_url}/subscriptionplan`,
   });
     
