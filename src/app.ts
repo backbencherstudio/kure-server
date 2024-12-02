@@ -11,7 +11,7 @@ import { pathName } from './app/Modules/audioPath/audiopath.module';
 import router from './app/routes';
 import { User } from './app/Modules/User/user.model';
 import globalErrorHandler from './app/middleware/globalErrorHandlear';
-
+  
 const app: Application = express();
 const stripe = new Stripe(config.stripe_test_secret_key as string);
 
