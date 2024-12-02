@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ['http://localhost:5173', "https://hypno4u.com"],  
+    origin: ['http://localhost:5173', "https://admin.hypno4u.com", "https://hypno4u.com"],  
     credentials: true,
   })
 );
