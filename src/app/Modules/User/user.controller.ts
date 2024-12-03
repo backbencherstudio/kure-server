@@ -58,7 +58,6 @@ const resetPassword = catchAsync(async (req, res) => {
   });
 });
 
-
 const setSelectedAudio = catchAsync(async (req, res) => {
   const { data } = req.body;  
   const result = await UserServices.setSelectedAudioIntoDB(data);
@@ -87,6 +86,8 @@ const loginUser = catchAsync(async (req, res) => {
   res.cookie('refreshToken', refreshToken, {
     secure: config.NODE_ENV === 'development',
     httpOnly: true,
+    sameSite : 'none',
+    
   });
   sendResponse(res, {
     statusCode: httpStatus.OK,
