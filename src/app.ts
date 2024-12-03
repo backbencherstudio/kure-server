@@ -154,13 +154,16 @@ app.get('/subscribe', async (req, res) => {
   
   switch (plan?.toLowerCase()) {
       case 'silver':
-      priceId = config.silver_plan_key; 
+      // priceId = config.silver_plan_key; 
+      priceId = "price_1QRnFACeMjBQYGyCL7JLPmWV"; 
       break;
       case 'gold':
-      priceId = config.golden_plan_key; 
+      // priceId = config.golden_plan_key; 
+      priceId = "price_1QRnBxCeMjBQYGyCfnWM2pIJ"; 
       break;
       case 'dimond':
-      priceId = config.dimond_plan_key; 
+      // priceId = config.dimond_plan_key; 
+      priceId = "price_1QRn3pCeMjBQYGyCgCKXr71O"; 
       break;
     default:
       return res.send('Subscription plan not found');
