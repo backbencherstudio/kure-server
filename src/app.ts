@@ -13,7 +13,8 @@ import { User } from './app/Modules/User/user.model';
 import globalErrorHandler from './app/middleware/globalErrorHandlear';
   
 const app: Application = express();
-const stripe = new Stripe(config.stripe_test_secret_key as string);
+// const stripe = new Stripe(config.stripe_test_secret_key as string);
+const stripe = new Stripe(config.stripe_live_secret_key as string);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -152,17 +153,14 @@ app.get('/subscribe', async (req, res) => {
   let priceId;
   
   switch (plan?.toLowerCase()) {
-    case 'test':
-      priceId = 'price_1QJqiPCeMjBQYGyCqZZKVILH'; 
+      case 'silver':
+      priceId = config.silver_plan_key; 
       break;
-    case 'silver':
-      priceId = 'price_1QJp7hCeMjBQYGyC82uuSJsN'; 
+      case 'gold':
+      priceId = config.golden_plan_key; 
       break;
-    case 'gold':
-      priceId = 'price_1QJrTXCeMjBQYGyCvr2E851m';
-      break;
-    case 'dimond':
-      priceId = 'price_1QJrX2CeMjBQYGyCWkpCn0Yi';
+      case 'dimond':
+      priceId = config.dimond_plan_key; 
       break;
     default:
       return res.send('Subscription plan not found');
