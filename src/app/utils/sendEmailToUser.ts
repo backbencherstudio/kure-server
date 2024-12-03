@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import nodemailer from 'nodemailer';
-import config from '../config';
 
 export const sendEmailToUser = async (to: string[], sub: string, message: string, file : any) => {
 
@@ -10,7 +9,7 @@ export const sendEmailToUser = async (to: string[], sub: string, message: string
     secure: true, 
     auth: {
       user: 'fozlerabbishuvo@gmail.com',
-      pass: config.email_pass, 
+      pass: "qhdg kwxf pwgp dbho", 
     },
   });
 

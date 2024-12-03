@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import config from '../config';
 
 export const sendEmail = async (to: string, otp: string) => {
   const transporter = nodemailer.createTransport({
@@ -8,13 +7,14 @@ export const sendEmail = async (to: string, otp: string) => {
     port: 465, 
     secure: true,
     auth: {
-      user: 'mybesthealer@gmail.com',
-      pass: config.email_pass , 
+      user: 'fozlerabbishuvo@gmail.com',
+      pass: "qhdg kwxf pwgp dbho" , 
+      // pass: config.email_pass , 
     },
   });
 
   await transporter.sendMail({
-    from: 'mybesthealer@gmail.com',
+    from: 'fozlerabbishuvo@gmail.com',
     to, 
     subject: 'Set your OTP withen 2m', 
     text: '', 
