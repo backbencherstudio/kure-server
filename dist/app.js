@@ -1,0 +1,199 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-undef */
+const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const multer_1 = __importDefault(require("multer"));
+const path_1 = __importDefault(require("path"));
+const stripe_1 = __importDefault(require("stripe"));
+const config_1 = __importDefault(require("./app/config"));
+const audiopath_module_1 = require("./app/Modules/audioPath/audiopath.module");
+const routes_1 = __importDefault(require("./app/routes"));
+const user_model_1 = require("./app/Modules/User/user.model");
+const globalErrorHandlear_1 = __importDefault(require("./app/middleware/globalErrorHandlear"));
+const app = (0, express_1.default)();
+const stripe = new stripe_1.default(config_1.default.stripe_live_secret_key);
+app.use(express_1.default.json());
+app.use((0, cookie_parser_1.default)());
+app.use((0, cors_1.default)({
+    origin: ['http://localhost:5173', "https://admin.hypno4u.com", "https://hypno4u.com"],
+    credentials: true,
+}));
+app.get('/test', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const a = 'server running successfully';
+    res.send(a);
+}));
+app.use("/api/v1", routes_1.default);
+app.use('/uploads', express_1.default.static('uploads'));
+app.get('/get-audios', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const audios = yield audiopath_module_1.pathName.find();
+        const audioUrls = audios.map(audio => audio.path);
+        res.status(200).json(audioUrls);
+    }
+    catch (err) {
+        console.error('Error fetching audio URLs:', err);
+        res.status(500).json({ message: 'Error fetching audio URLs' });
+    }
+}));
+const storage = multer_1.default.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path_1.default.extname(file.originalname));
+    },
+});
+const upload = (0, multer_1.default)({ storage: storage });
+app.post('/upload-audio', upload.single('audio'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.file) {
+        return res.status(400).send('No file uploaded');
+    }
+    try {
+        const newAudioUrl = `/uploads/${req.file.filename}`;
+        res.status(200).send({ filePath: newAudioUrl });
+    }
+    catch (err) {
+        console.error('Error saving audio URL:', err);
+        res.status(500).send('Error saving audio URL');
+    }
+}));
+app.post("/path-name", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { audio, category, categoryStatus, name } = req.body;
+    if (path_1.default) {
+        const result = yield audiopath_module_1.pathName.create({ audio, category, categoryStatus, name });
+        res.send(result);
+        return;
+    }
+}));
+app.patch("/api/v1/path-name", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { getId: id, audio, category, categoryStatus, name } = req.body;
+    if (path_1.default) {
+        const result = yield audiopath_module_1.pathName.findByIdAndUpdate(id, { audio, category, categoryStatus, name }, { new: true, runValidators: true });
+        res.send(result);
+        return;
+    }
+}));
+app.get("/api/v1/get-path-name", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const categoryStatus = (_a = req === null || req === void 0 ? void 0 : req.query) === null || _a === void 0 ? void 0 : _a.showCategoryStatus;
+    const email = (_b = req === null || req === void 0 ? void 0 : req.query) === null || _b === void 0 ? void 0 : _b.email;
+    const isExists = yield user_model_1.User.findOne({ email });
+    const selectedPaths = yield audiopath_module_1.pathName.find({
+        _id: { $in: isExists === null || isExists === void 0 ? void 0 : isExists.selectedBodyAudios }
+    });
+    const groupedSelectedPaths = selectedPaths.reduce((groups, path) => {
+        const { category } = path;
+        if (!groups[category]) {
+            groups[category] = [];
+        }
+        groups[category].push(path);
+        return groups;
+    }, {});
+    const selectedBodyitem = groupedSelectedPaths === null || groupedSelectedPaths === void 0 ? void 0 : groupedSelectedPaths.body;
+    const selectedMinditem = groupedSelectedPaths === null || groupedSelectedPaths === void 0 ? void 0 : groupedSelectedPaths.mind;
+    const selectedEgoitem = groupedSelectedPaths === null || groupedSelectedPaths === void 0 ? void 0 : groupedSelectedPaths.ego;
+    const selectedselfitem = groupedSelectedPaths === null || groupedSelectedPaths === void 0 ? void 0 : groupedSelectedPaths.self;
+    const result = yield audiopath_module_1.pathName.find();
+    const self = yield audiopath_module_1.pathName.find({ category: 'self', categoryStatus });
+    const body = yield audiopath_module_1.pathName.find({ category: 'body', categoryStatus });
+    const mind = yield audiopath_module_1.pathName.find({ category: 'mind', categoryStatus });
+    const ego = yield audiopath_module_1.pathName.find({ category: 'ego', categoryStatus });
+    const vault = yield audiopath_module_1.pathName.find({ category: 'vault' });
+    const intro = yield audiopath_module_1.pathName.find({ category: 'intro' });
+    res.send({
+        result,
+        self,
+        body,
+        mind,
+        ego,
+        selectedBodyitem,
+        selectedMinditem,
+        selectedEgoitem,
+        selectedselfitem,
+        vault,
+        intro
+    });
+}));
+// ===========================================================================  Subscription 
+app.get('/subscribe', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const plan = req.query.plan;
+    if (!plan || typeof plan !== 'string') {
+        return res.send('Subscription plan not found');
+    }
+    let priceId;
+    switch (plan === null || plan === void 0 ? void 0 : plan.toLowerCase()) {
+        case 'silver':
+            priceId = config_1.default.silver_plan_key;
+            break;
+        case 'gold':
+            priceId = config_1.default.golden_plan_key;
+            break;
+        case 'dimond':
+            priceId = config_1.default.dimond_plan_key;
+            break;
+        default:
+            return res.send('Subscription plan not found');
+    }
+    const session = yield stripe.checkout.sessions.create({
+        mode: 'subscription',
+        line_items: [{ price: priceId, quantity: 1 }],
+        success_url: `${config_1.default.client_base_url}/daily-audios?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${config_1.default.client_base_url}/subscriptionplan`,
+    });
+    res.redirect(session.url);
+}));
+app.get('/success', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c, _d, _e;
+    try {
+        const sessionId = req === null || req === void 0 ? void 0 : req.query.session_id;
+        if (!sessionId || typeof sessionId !== 'string') {
+            return res.status(400).send('Invalid or missing session_id');
+        }
+        const session = yield stripe.checkout.sessions.retrieve(sessionId, {
+            expand: ['subscription', 'subscription.plan.product'],
+        });
+        const subscription = session.subscription;
+        const subscriptionDetails = yield stripe.subscriptions.retrieve(subscription.id, {
+            expand: ['items.data.price'],
+        });
+        const planAmount = ((_d = (_c = subscriptionDetails.items.data[0]) === null || _c === void 0 ? void 0 : _c.price) === null || _d === void 0 ? void 0 : _d.unit_amount) || 0;
+        const sessionData = {
+            customer_id: subscription.customer || null,
+            subscription_email: ((_e = session.customer_details) === null || _e === void 0 ? void 0 : _e.email) || null,
+            plan: planAmount / 100,
+            status: subscriptionDetails.status || null,
+        };
+        res.status(200).json(sessionData);
+    }
+    catch (error) {
+        console.error('Error retrieving session:', error.message);
+        res.status(500).json({ error: 'Failed to retrieve session details' });
+    }
+}));
+app.get('/cancel', (req, res) => {
+    res.redirect('/');
+});
+app.get("/customers/:customerId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const portalSession = yield stripe.billingPortal.sessions.create({
+        customer: req.params.customerId,
+        return_url: `${config_1.default.client_base_url}`
+    });
+    res.redirect(portalSession.url);
+}));
+app.use(globalErrorHandlear_1.default);
+exports.default = app;
