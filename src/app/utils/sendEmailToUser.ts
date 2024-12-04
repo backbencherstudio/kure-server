@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import nodemailer from 'nodemailer';
+import config from '../config';
 
 export const sendEmailToUser = async (to: string[], sub: string, message: string, file : any) => {
 
@@ -8,15 +9,15 @@ export const sendEmailToUser = async (to: string[], sub: string, message: string
     port: 465, 
     secure: true, 
     auth: {
-      user: 'fozlerabbishuvo@gmail.com',
-      pass: "qhdg kwxf pwgp dbho", 
+      user: config.sender_email,
+      pass: config.email_pass ,  
     },
   });
-
+  
   const recipientEmails = to.join(',');
-
+  
   await transporter.sendMail({
-    from: 'fozlerabbishuvo@gmail.com',
+    from: config.sender_email,
     to: recipientEmails,
     subject: sub,
     text: '', 
