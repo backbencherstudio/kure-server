@@ -15,7 +15,6 @@ import globalErrorHandler from './app/middleware/globalErrorHandlear';
 const app: Application = express();
 const stripe = new Stripe(config.stripe_live_secret_key as string);
 
-
 app.use(express.json());
 app.use(cookieParser());
 app.use(
