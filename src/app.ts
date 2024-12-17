@@ -106,7 +106,7 @@ app.delete("/api/v1/removeAudio/:id", async (req, res) => {
           console.error("Error deleting audio file:", err);
           return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: "Failed to delete audio file" });
         }
-        return res.status(httpStatus.OK).json({ message: "Audio and data deleted successfully" });
+        return res.status(httpStatus.OK).json({ message: "Audio deleted successfully" });
       });
     } else {
       console.warn("File does not exist:", filePath);
