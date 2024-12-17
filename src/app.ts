@@ -11,6 +11,8 @@ import { pathName } from './app/Modules/audioPath/audiopath.module';
 import router from './app/routes';
 import { User } from './app/Modules/User/user.model';
 import globalErrorHandler from './app/middleware/globalErrorHandlear';
+import httpStatus from 'http-status';
+import fs from "fs"
   
 const app: Application = express();
 const stripe = new Stripe(config.stripe_live_secret_key as string);
@@ -37,7 +39,6 @@ app.get('/get-audios', async (req, res) => {
   try {
     const audios = await pathName.find(); 
     const audioUrls = audios.map(audio => audio.path);  
-
     res.status(200).json(audioUrls);
   } catch (err) {
     console.error('Error fetching audio URLs:', err);
@@ -53,6 +54,7 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + path.extname(file.originalname));
   },
 });
+
 
 const upload = multer({ storage: storage });
 
@@ -88,34 +90,56 @@ app.patch("/api/v1/path-name", async (req, res) => {
 });
 
 
+app.delete("/api/v1/removeAudio/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const isAxists = await pathName.findById(id);
+    if (!isAxists) {
+      return res.status(httpStatus.NOT_FOUND).json({ message: "Audio not found" });
+    }
+    const audioPath = isAxists.audio;
+    await pathName.findByIdAndDelete(id);
+    const filePath = path.resolve(__dirname, "../uploads", path.basename(audioPath));
+    if (fs.existsSync(filePath)) {
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting audio file:", err);
+          return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: "Failed to delete audio file" });
+        }
+        return res.status(httpStatus.OK).json({ message: "Audio and data deleted successfully" });
+      });
+    } else {
+      console.warn("File does not exist:", filePath);
+      return res.status(httpStatus.NOT_FOUND).json({ message: "Audio file not found on the server" });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
+  }
+});
+
+
+
 app.get("/api/v1/get-path-name", async (req, res) => {
   const categoryStatus = req?.query?.showCategoryStatus   
   const email = req?.query?.email
   const isExists = await User.findOne({email})  
-
   const selectedPaths = await pathName.find({ 
     _id: { $in: isExists?.selectedBodyAudios }
   });
-  
   const groupedSelectedPaths = selectedPaths.reduce((groups : any, path) => {
     const { category } = path;
-
     if (!groups[category] ) {
       groups[category] = [];
     }
     groups[category].push(path);
-
     return groups;
-
   }, {});
-  
   const selectedBodyitem = groupedSelectedPaths?.body;
   const selectedMinditem = groupedSelectedPaths?.mind;
   const selectedEgoitem = groupedSelectedPaths?.ego;
   const selectedselfitem = groupedSelectedPaths?.self;
-
     const result = await pathName.find();
-
     const self = await pathName.find({category: 'self', categoryStatus });
     const body = await pathName.find({category: 'body', categoryStatus});
     const mind = await pathName.find({category: 'mind', categoryStatus});
@@ -136,20 +160,16 @@ app.get("/api/v1/get-path-name", async (req, res) => {
       vault,
       intro
     });
-
 });
 
 // ===========================================================================  Subscription 
 
 app.get('/subscribe', async (req, res) => {
   const plan = req.query.plan;
-
   if (!plan || typeof plan !== 'string') {
     return res.send('Subscription plan not found');
   }
-
   let priceId;
-  
   switch (plan?.toLowerCase()) {
       case 'silver':
       priceId = config.silver_plan_key;  
@@ -163,14 +183,12 @@ app.get('/subscribe', async (req, res) => {
     default:
       return res.send('Subscription plan not found');
   }
-
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${config.client_base_url}/daily-audios?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${config.client_base_url}/subscriptionplan`,
   });
-    
   res.redirect(session.url as string);
 });
 
@@ -201,11 +219,9 @@ app.get('/success', async (req, res) => {
     res.status(500).json({ error: 'Failed to retrieve session details' });
   }
 });
-
 app.get('/cancel', (req, res) => {
   res.redirect('/');
 });
-
 app.get("/customers/:customerId", async(req, res)=>{
   const portalSession = await stripe.billingPortal.sessions.create({
     customer : req.params.customerId,
@@ -213,9 +229,5 @@ app.get("/customers/:customerId", async(req, res)=>{
   })
   res.redirect(portalSession.url)
 } )
-
-
 app.use(globalErrorHandler);
-
-
 export default app;
