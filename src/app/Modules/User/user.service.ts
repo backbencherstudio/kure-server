@@ -9,6 +9,29 @@ import { sendEmail } from "../../utils/sendEmail";
 import { createToken, verifyToken } from "./user.utils";
 import { sendEmailToUser } from "../../utils/sendEmailToUser";
 
+// const getAllUserFromDB = async (payload : string ) =>{ 
+
+//   if(payload === "all"){
+//     const result = await User.find()
+//     return result
+//   }
+
+//   if(payload === "inactive"){
+//     const date : any = new Date()
+//     const result2 = await User.find()
+//     const filterData = result2.filter(item => {
+//       const createdAtDate : any = new Date(item.createdAt);
+//       const timeDifferenceInDays = Math.floor((date - createdAtDate) / (1000 * 60 * 60 * 24)); 
+//       return parseInt(timeDifferenceInDays) > item.selfId; 
+//     });  
+//     return filterData
+//   }
+
+//   const isSubscribeUser = payload === "nonSubscriber"
+//   const result = await User.find({isDeleted : isSubscribeUser })
+//   return result
+
+// }
 
 
 const getAllUserFromDB = async (payload: string): Promise<any[]> => { 
