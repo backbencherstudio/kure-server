@@ -13,6 +13,7 @@ import { User } from './app/Modules/User/user.model';
 import globalErrorHandler from './app/middleware/globalErrorHandlear';
 import httpStatus from 'http-status';
 import fs from "fs"
+import { getAllAudiosCache, setAllAudiosCache } from './app/utils/cashData';
   
 const app: Application = express();
 const stripe = new Stripe(config.stripe_live_secret_key as string);
@@ -119,50 +120,179 @@ app.delete("/api/v1/removeAudio/:id", async (req, res) => {
 });
 
 
+// app.get("/api/v1/get-path-name", async (req, res) => {
+ 
+
+//   const categoryStatus = req?.query?.showCategoryStatus   
+//   const email = req?.query?.email  
+
+
+//   const isExists = await User.findOne({email})  
+//   const selectedPaths = await pathName.find({ 
+//     _id: { $in: isExists?.selectedBodyAudios }
+//   });
+//   const groupedSelectedPaths = selectedPaths.reduce((groups : any, path) => {
+//     const { category } = path;
+//     if (!groups[category] ) {
+//       groups[category] = [];
+//     }
+//     groups[category].push(path);
+//     return groups;
+//   }, {});
+//   const selectedBodyitem = groupedSelectedPaths?.body;
+//   const selectedMinditem = groupedSelectedPaths?.mind;
+//   const selectedEgoitem = groupedSelectedPaths?.ego;
+//   const selectedselfitem = groupedSelectedPaths?.self;
+//     const result = await pathName.find();
+//     const self = await pathName.find({category: 'self', categoryStatus });
+//     const body = await pathName.find({category: 'body', categoryStatus});
+//     const mind = await pathName.find({category: 'mind', categoryStatus});
+//     const ego = await pathName.find({category: 'ego', categoryStatus});
+//     const vault = await pathName.find({category: 'vault'});    
+//     const intro = await pathName.find({category: 'intro'});   
+    
+//     res.send({
+//       result,
+//       self,
+//       body,
+//       mind,
+//       ego, 
+//       selectedBodyitem,
+//       selectedMinditem,
+//       selectedEgoitem,
+//       selectedselfitem,
+//       vault,
+//       intro
+//     });
+
+// });
+
+
+// ===========================================================================  Subscription 
+
+
+// app.get("/api/v1/get-path-name", async (req, res) => {
+//   try {
+//     const cacheData = await getAllAudiosCache();
+//     if (cacheData?.length > 0) {
+//       return res.send({ cacheData });
+//     }
+
+//     const categoryStatus = req.query.showCategoryStatus;
+//     const email = req.query.email;
+
+//     const isExists = await User.findOne({ email });
+//     const selectedPaths = await pathName.find({
+//       _id: { $in: isExists?.selectedBodyAudios || [] },
+//     });
+
+//     const groupedSelectedPaths = selectedPaths.reduce((groups: any, path) => {
+//       const { category } = path;
+//       if (!groups[category]) {
+//         groups[category] = [];
+//       }
+//       groups[category].push(path);
+//       return groups;
+//     }, {});
+
+//     const selectedBodyitem = groupedSelectedPaths?.body || [];
+//     const selectedMinditem = groupedSelectedPaths?.mind || [];
+//     const selectedEgoitem = groupedSelectedPaths?.ego || [];
+//     const selectedselfitem = groupedSelectedPaths?.self || [];
+
+//     const result = await pathName.find();
+//     const self = await pathName.find({ category: "self", categoryStatus });
+//     const body = await pathName.find({ category: "body", categoryStatus });
+//     const mind = await pathName.find({ category: "mind", categoryStatus });
+//     const ego = await pathName.find({ category: "ego", categoryStatus });
+//     const vault = await pathName.find({ category: "vault" });
+//     const intro = await pathName.find({ category: "intro" });
+
+//     if (result.length > 0) {
+//       await setAllAudiosCache(result);
+//     }
+
+//     res.send({
+//       result,
+//       self,
+//       body,
+//       mind,
+//       ego,
+//       selectedBodyitem,
+//       selectedMinditem,
+//       selectedEgoitem,
+//       selectedselfitem,
+//       vault,
+//       intro,
+//     });
+//   } catch (error) {
+//     console.error("Error in /api/v1/get-path-name:", error);
+//     res.status(500).send({ error: "Internal Server Error" });
+//   }
+// });
+
 
 app.get("/api/v1/get-path-name", async (req, res) => {
-  const categoryStatus = req?.query?.showCategoryStatus   
-  const email = req?.query?.email
-  const isExists = await User.findOne({email})  
-  const selectedPaths = await pathName.find({ 
-    _id: { $in: isExists?.selectedBodyAudios }
-  });
-  const groupedSelectedPaths = selectedPaths.reduce((groups : any, path) => {
-    const { category } = path;
-    if (!groups[category] ) {
-      groups[category] = [];
+  try {
+    const cacheData = await getAllAudiosCache();
+    if (cacheData) {
+      return res.send({result :cacheData});
     }
-    groups[category].push(path);
-    return groups;
-  }, {});
-  const selectedBodyitem = groupedSelectedPaths?.body;
-  const selectedMinditem = groupedSelectedPaths?.mind;
-  const selectedEgoitem = groupedSelectedPaths?.ego;
-  const selectedselfitem = groupedSelectedPaths?.self;
+
+    const categoryStatus = req?.query.showCategoryStatus;
+    const email = req.query.email;    
+
+    const isExists = await User.findOne({ email });
+    const selectedPaths = await pathName.find({
+      _id: { $in: isExists?.selectedBodyAudios || [] },
+    });
+
+    const groupedSelectedPaths = selectedPaths.reduce((groups: any, path) => {
+      const { category } = path;
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(path);
+      return groups;
+    }, {});
+
+    const selectedBodyitem = groupedSelectedPaths?.body || [];
+    const selectedMinditem = groupedSelectedPaths?.mind || [];
+    const selectedEgoitem = groupedSelectedPaths?.ego || [];
+    const selectedselfitem = groupedSelectedPaths?.self || [];
+
     const result = await pathName.find();
-    const self = await pathName.find({category: 'self', categoryStatus });
-    const body = await pathName.find({category: 'body', categoryStatus});
-    const mind = await pathName.find({category: 'mind', categoryStatus});
-    const ego = await pathName.find({category: 'ego', categoryStatus});
-    const vault = await pathName.find({category: 'vault'});    
-    const intro = await pathName.find({category: 'intro'});    
-     
-    res.send({
+    const self = await pathName.find({ category: "self", categoryStatus });
+    const body = await pathName.find({ category: "body", categoryStatus });
+    const mind = await pathName.find({ category: "mind", categoryStatus });
+    const ego = await pathName.find({ category: "ego", categoryStatus });
+    const vault = await pathName.find({ category: "vault" });
+    const intro = await pathName.find({ category: "intro" });
+
+    const dataToCache = {
       result,
       self,
       body,
       mind,
-      ego, 
+      ego,
       selectedBodyitem,
       selectedMinditem,
       selectedEgoitem,
       selectedselfitem,
       vault,
-      intro
-    });
+      intro,
+    };
+    await setAllAudiosCache(dataToCache);
+    res.send(dataToCache);
+  } catch (error) {
+    console.error("Error in /api/v1/get-path-name:", error);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
 });
 
-// ===========================================================================  Subscription 
+
+
+
 
 app.get('/subscribe', async (req, res) => {
   const plan = req.query.plan;

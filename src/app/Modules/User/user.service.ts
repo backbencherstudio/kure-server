@@ -8,6 +8,7 @@ import { TLoginUser, TUser } from "./user.interface";
 import { sendEmail } from "../../utils/sendEmail";
 import { createToken, verifyToken } from "./user.utils";
 import { sendEmailToUser } from "../../utils/sendEmailToUser";
+import { getCache, setCache } from "../../utils/cashData";
 
 // const getAllUserFromDB = async (payload : string ) =>{ 
 
@@ -33,8 +34,48 @@ import { sendEmailToUser } from "../../utils/sendEmailToUser";
 
 // }
 
+// const getAllUserFromDB = async (payload: string): Promise<any[]> => {
+//   // Fetch cached data
+//   const cachedData = await getCache();
+//   if (cachedData?.length > 0) {
+//     return cachedData;
+//   }
+//   console.log(cachedData);
+  
+//   let result: any[] = [];
+//   const date = new Date();
+
+//   if (payload === "all") {
+//     result = await User.find();
+//   } else if (payload === "inactive") {
+//     const users = await User.find({ isDeleted: false });
+//     result = users.filter((user) => {
+//       const createdAtDate = new Date(user.createdAt as Date);
+//       const timeDifferenceInDays = Math.floor(
+//         (date.getTime() - createdAtDate.getTime()) / (1000 * 60 * 60 * 24)
+//       );
+//       return typeof user.selfId === "number" && timeDifferenceInDays > user.selfId;
+//     });
+//   } else if (payload === "nonSubscriber") {
+//     result = await User.find({ isDeleted: true });
+//   }
+  
+//   console.log(result);
+  
+//   // Cache the result
+//   if (result.length > 0) {
+//     await setCache(result);
+//   }
+
+//   return result;
+// };
+
 
 const getAllUserFromDB = async (payload: string): Promise<any[]> => { 
+  const cachedData = await getCache();
+  if (cachedData?.length > 0) {
+    return cachedData;
+  }
   if (payload === "all") {
     const result = await User.find();
     return result;
@@ -52,9 +93,13 @@ const getAllUserFromDB = async (payload: string): Promise<any[]> => {
   }
   const isSubscribeUser = payload === "nonSubscriber";
   const result = await User.find({ isDeleted: isSubscribeUser });
+
+  if (result.length > 0) {
+    await setCache(result);
+  }
+
   return result;
 };
-
 
 
 const getSingleUserFromDB = async (email : string) =>{  
