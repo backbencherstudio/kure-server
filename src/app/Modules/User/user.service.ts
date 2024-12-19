@@ -33,6 +33,7 @@ import { sendEmailToUser } from "../../utils/sendEmailToUser";
 
 // }
 
+
 const getAllUserFromDB = async (payload: string): Promise<any[]> => { 
   if (payload === "all") {
     const result = await User.find();
@@ -53,6 +54,8 @@ const getAllUserFromDB = async (payload: string): Promise<any[]> => {
   const result = await User.find({ isDeleted: isSubscribeUser });
   return result;
 };
+
+
 
 const getSingleUserFromDB = async (email : string) =>{  
   const result = await User.findOne({email})
